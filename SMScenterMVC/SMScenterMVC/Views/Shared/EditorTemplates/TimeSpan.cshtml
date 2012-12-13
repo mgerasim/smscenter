@@ -1,0 +1,9 @@
+﻿@model TimeSpan
+ 
+@Html.DropDownList("", Enumerable.Range(0, 24)
+    .Select(i => new SelectListItem { Value = i.ToString(),
+    Text = i.ToString(), Selected = Model.Hours == i }))&nbsp;:
+ 
+@Html.DropDownList("", Enumerable.Range(0, 60)
+    .Select(i => new SelectListItem { Value = i.ToString(),
+    Text = i.ToString(), Selected = Model.Minutes == i }))

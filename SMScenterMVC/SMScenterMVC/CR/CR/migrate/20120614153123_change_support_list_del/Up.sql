@@ -1,0 +1,1 @@
+DELETE FROM SUPPORT WHERE email like '%TurushevNA@khv.dv.rt.ru%'

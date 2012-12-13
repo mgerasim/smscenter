@@ -1,0 +1,38 @@
+﻿@model SMScenterMVC.Models.BrancheModel
+
+@{
+    ViewBag.Title = "Создание филиала";
+}
+
+<h2>Создание филиала</h2>
+
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+    <fieldset>
+        <legend>Филиал</legend>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.name_short)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.name_short)
+            @Html.ValidationMessageFor(model => model.name_short)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.name_full)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.name_full)
+            @Html.ValidationMessageFor(model => model.name_full)
+        </div>
+
+        <p>
+            <input type="submit" value="Создать" /> @Html.ActionLink("Отмена", "Index")
+        </p>
+    </fieldset>
+}
+

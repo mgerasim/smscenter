@@ -1,0 +1,15 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="SmsCenter" GeneratedClassName="SmsCenterSetting">
+  <Profiles />
+  <Settings>
+    <Setting Name="ConnectionStringRelease" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Data Source=SMSRTKDV; User ID=smscenter; Password=zaq12wsx</Value>
+    </Setting>
+    <Setting Name="LimitTask" Type="System.UInt32" Scope="User">
+      <Value Profile="(Default)">25</Value>
+    </Setting>
+    <Setting Name="ConnectionStringDebug" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Data Source=SMSRTKDV; User ID=smscenter_debug; Password=zaq12wsx</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

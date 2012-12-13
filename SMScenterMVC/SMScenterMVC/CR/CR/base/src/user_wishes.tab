@@ -1,0 +1,15 @@
+create table USER_WISHES
+(
+  ID         NUMBER not null,
+  TEXT       VARCHAR2(500),
+  USER_ID    NUMBER not null,
+  CREATE_AT  DATE default sysdate not null,
+  BRANCHE_ID NUMBER not null
+)
+;
+alter table USER_WISHES
+  add constraint PK_USER_WISHES primary key (ID);
+alter table USER_WISHES
+  add constraint FK_USER_WISHES_USER_ID foreign key (USER_ID)
+  references USERS (ID);
+

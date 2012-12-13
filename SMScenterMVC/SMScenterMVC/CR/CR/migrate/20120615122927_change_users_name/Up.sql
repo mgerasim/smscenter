@@ -1,0 +1,1 @@
+UPDATE USERS SET NAME = replace(NAME, 'CORP\','')

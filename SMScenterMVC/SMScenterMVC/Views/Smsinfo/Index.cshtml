@@ -1,0 +1,157 @@
+﻿@model SMScenterMVC.Models.SmsModel
+@helper MsgView(SMScenterMVC.Models.SmsinfosprModel theSpr)
+    {
+    List<SMScenterMVC.Models.SmsinfomsgModel> theMsgList = new List<SMScenterMVC.Models.SmsinfomsgModel>();
+    theMsgList = (new SMScenterMVC.Models.SmsinfomsgModel()).FindAll("SMSINFOSPR_ID=" + theSpr.ID);
+    
+    
+    foreach (SMScenterMVC.Models.SmsinfomsgModel theMsg in theMsgList)
+    {
+        <li>
+                <input type="checkbox" name="selectedObjects" value="@theMsg.ID" onclick = "javascript: AddRemTxt('@theMsg.Text',this,'Msg')"> @theMsg.Name
+                    
+        </li>
+    }
+}       
+    
+@helper TreeView(List<SMScenterMVC.Models.SmsinfosprModel> theSprList)
+    {
+        foreach (var theSpr in theSprList)
+        {
+        <li>
+            @if (theSpr.FindAll("PARENT_ID=" + theSpr.ID.ToString()).Count == 0)
+            {
+                <span id="@theSpr.ID">@theSpr.Name</span> 
+                <ul>
+                    @MsgView(theSpr)
+                </ul>
+
+            }
+            else
+            {
+                <span >@theSpr.Name</span>
+                <ul>
+                    @MsgView(theSpr)
+                </ul>
+                <ul>
+                    @TreeView(theSpr.FindAll("PARENT_ID=" + theSpr.ID.ToString()))
+                </ul>
+            }
+        </li>
+        }
+}
+
+
+
+@{
+    ViewBag.Title = "АРМ SMS";
+}
+
+<h2>АРМ SMS</h2>
+
+<div id="parttop">
+    
+	@using (Html.BeginForm())
+	{
+
+		<table>
+			<tr>
+				<th>
+					<div class="editor-label">
+						@Html.LabelFor(model => model.Smsnumber)						
+					</div>
+				</th>
+				<th>
+					<div class="editor-label">
+						@Html.LabelFor(model => model.Msg)
+					</div>
+				</th>
+				<th>
+				</th>
+			</tr>
+			<tr>
+				<td>
+					<div class="editor-label">
+						@Html.TextBoxFor(m => m.Smsnumber)
+					</div>
+						
+				</td>
+
+				<td>
+					<div class="editor-label">
+						@Html.TextAreaFor(m => m.Msg)
+					</div>
+				</td>
+
+				<td>					
+					<p>
+						<input type="submit" value="Отправить" />
+					</p>
+				</td>
+			</tr>
+		</table>
+
+
+		
+				
+
+    }
+</div>
+
+<div id="partbottom" >
+    
+
+    @{
+        List<SMScenterMVC.Models.SmsinfosprModel> theSprList = new List<SMScenterMVC.Models.SmsinfosprModel>();
+        theSprList = (new SMScenterMVC.Models.SmsinfosprModel()).FindAll("PARENT_ID=0");
+    }
+
+
+	<table>
+		<tr>
+			@foreach (var theSpr in theSprList)
+			{
+				<th>
+					@theSpr.Name
+				</th>  
+			}
+		</tr>
+
+		<tr valign="top">
+			@foreach (var theSpr in theSprList)
+			{
+				<td>
+					<ul class="continentFolders">
+						@TreeView(theSpr.FindAll("PARENT_ID=" + theSpr.ID.ToString()))
+					</ul>
+				</td>  
+			}
+		</tr>
+	</table>
+
+    
+
+    
+
+    
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.continentFolders').treeview({ collapsed: false });
+
+            $(".leaf.city").click(function () {
+                $.ajax({
+                    url: '/MVC3Extensions/Various/TreeView/GetCity',
+                    data: { cityId: $(this).attr("id") },
+                    type: 'GET',
+                    success: function (data) {
+                        alert("Selected city: " + data.Name + ", population: " + data.Population.toString());
+                    }
+                });
+            });
+        });
+    </script>
+
+
+   
+</div>

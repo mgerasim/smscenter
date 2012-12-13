@@ -1,0 +1,33 @@
+﻿@model SMScenterMVC.Models.UserWishesModel
+
+@{
+    ViewBag.Title = "Просмотр пожелания";
+}
+
+<fieldset>
+<legend>Просмотр пожелания</legend>
+        <br />
+        <br />
+    <table class="other_param" style="width: 100%">
+     <tr>    
+        <th width="15%">Пользователь:</th>
+        <td width="85%"> @Model.User_Name </td>
+     </tr>
+     <tr>
+        <th>Дата:</th>
+        <td>@Model.Create_at</td>
+     </tr>
+     <tr>
+         <th>Филиал:</th>
+         <td>@Model.Branche_Name</td>
+     </tr>
+     <tr>
+         <th>Пожелание:</th>
+         <td><textarea rows="5" style="width: 99%" readonly="readonly">@Model.Text</textarea></td>
+     </tr>
+    </table> 
+</fieldset>
+<p>
+    @Html.ActionLink("Вернуться к списку пожеланий", "Index")
+</p>
+

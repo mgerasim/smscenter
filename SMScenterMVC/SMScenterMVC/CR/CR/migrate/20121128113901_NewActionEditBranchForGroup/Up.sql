@@ -1,0 +1,1 @@
+INSERT INTO USER_ACTIONS(ID, NAME, DESCRIPTION) VALUES (S_ACTIONS.nextval, 'Groups::BranchEdit', 'Edit branch of group');

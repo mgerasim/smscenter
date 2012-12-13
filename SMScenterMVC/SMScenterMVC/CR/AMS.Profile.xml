@@ -1,0 +1,1955 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>AMS.Profile</name>
+    </assembly>
+    <members>
+        <member name="T:AMS.Profile.Config">
+            <summary>
+              Profile class that utilizes an XML-formatted .config file to retrieve and save its data. </summary>
+            <remarks>
+              Config files are used by Windows and Web apps to store application-specific configuration information.
+              The System.Configuration namespace contains a variety of classes that may be used to retrieve the data
+              from config files; however there is no provision for writing to such files.  The reason: they're only 
+              meant to be read by the program, not written.  For this reason, I initially considered not writing a 
+              Profile class for config files.  Instead, I created a separate <see cref="T:AMS.Profile.Xml"/> class that stores 
+              profile data in its own XML format, meant for a separate file.  Although that is the preferred choice, 
+              there may still be some developers who, for whatever reason, need a way to write to config files at 
+              run-time.  If you're one of those, this class is for you.
+              <para> 
+              By default this class formats the data inside the config file as follows.  
+              (Notice that XML elements cannot contain spaces so this class converts them to underscores.) </para> 
+              <code> 
+              &lt;configuration&gt;
+                &lt;configSections&gt; 
+                  &lt;sectionGroup name="profile"&gt;
+                    &lt;section name="A_Section" type="System.Configuration.NameValueSectionHandler, System, Version=1.0.3300.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, Custom=null" /&gt;
+                    &lt;section name="Another_Section" type="System.Configuration.NameValueSectionHandler, System, Version=1.0.3300.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, Custom=null" /&gt;
+                  &lt;/sectionGroup&gt;
+                &lt;/configSections&gt;
+                &lt;appSettings&gt;
+                  &lt;add key="App Entry" value="App Value" /&gt;
+                &lt;/appSettings&gt;
+                &lt;profile&gt;
+                  &lt;A_Section&gt;
+                    &lt;add key="An Entry" value="Some Value" /&gt;
+                    &lt;add key="Another Entry" value="Another Value" /&gt;
+                  &lt;/A_Section&gt;
+                  &lt;Another_Section&gt;
+                    &lt;add key="This is cool" value="True" /&gt;
+                  &lt;/Another_Section&gt;
+                &lt;/profile&gt;
+              &lt;/configuration&gt;
+              </code>
+              <para> 
+              If you wanted to read the value of "A_Section/An Entry" using the System.Configuration classes, you'd do it using the following code: </para>
+              <code> 
+              NameValueCollection section = (NameValueCollection)ConfigurationSettings.GetConfig("profile/A_Section");
+              string value = section["An Entry"];
+              </code>
+              <para> 
+              One thing to keep in mind is that .NET caches the config data as it reads it, so any subsequent 
+              updates to it on the file will not be seen by the System.Configuration classes, at least for Windows apps.
+              The Config class, however, has no such problem since the data is read from the file every time,
+              unless <see cref="P:AMS.Profile.XmlBased.Buffering"/> is enabled.
+              The equivalent of the above code would look like this: </para>
+              <code> 
+              Config config = new Config();
+              string value = config.GetValue("A Section", "An Entry", null);
+              </code> 
+              <para> 
+              As a bonus, you may use the Config class to access the "appSettings" section by clearing the
+              GroupName property.  Here's an example: </para>
+              <code> 
+              Config config = new Config();
+              config.GroupName = null;  // don't use a section group
+              ...
+              string value = config.GetValue("appSettings", "App Entry", null);
+              config.SetValue("appSettings", "Update Date", DateTime.Today);
+              </code>
+              </remarks>
+        </member>
+        <member name="T:AMS.Profile.XmlBased">
+            <summary>
+              Abstract base class for all XML-based Profile classes. </summary>
+            <remarks>
+              This class provides common methods and properties for the XML-based Profile classes 
+              (<see cref="T:AMS.Profile.Xml"/>, <see cref="T:AMS.Profile.Config"/>). </remarks>
+        </member>
+        <member name="T:AMS.Profile.Profile">
+            <summary>
+              Abstract base class for all Profile classes in this namespace. </summary>
+            <remarks>
+              This class contains fields and methods which are common for all the derived Profile classes. 
+              It fully implements most of the methods and properties of its base interfaces so that 
+              derived classes don't have to. </remarks>
+        </member>
+        <member name="T:AMS.Profile.IProfile">
+            <summary>
+              Interface implemented by all profile classes in this namespace.
+              It represents a normal profile. </summary>
+            <remarks>
+              This interface takes the members of IReadOnlyProfile (its base interface) and adds
+              to it the rest of the members, which allow modifications to the profile.  
+              Altogether, this represents a complete profile object. </remarks>
+            <seealso cref="T:AMS.Profile.IReadOnlyProfile"/>
+            <seealso cref="T:AMS.Profile.Profile"/>
+        </member>
+        <member name="T:AMS.Profile.IReadOnlyProfile">
+            <summary>
+              Base interface for all profile classes in this namespace.
+              It represents a read-only profile. </summary>
+            <seealso cref="T:AMS.Profile.IProfile"/>
+            <seealso cref="T:AMS.Profile.Profile"/>
+        </member>
+        <member name="M:AMS.Profile.IReadOnlyProfile.GetValue(System.String,System.String)">
+            <summary>
+              Retrieves the value of an entry inside a section. </summary>
+            <param name="section">
+              The name of the section that holds the entry with the value. </param>
+            <param name="entry">
+              The name of the entry where the value is stored. </param>
+            <returns>
+              The return value should be the entry's value, or null if the entry does not exist. </returns>
+            <seealso cref="M:AMS.Profile.IReadOnlyProfile.HasEntry(System.String,System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.IReadOnlyProfile.GetValue(System.String,System.String,System.String)">
+            <summary>
+              Retrieves the value of an entry inside a section, or a default value if the entry does not exist. </summary>
+            <param name="section">
+              The name of the section that holds the entry with the value. </param>
+            <param name="entry">
+              The name of the entry where the value is stored. </param>
+            <param name="defaultValue">
+              The value to return if the entry (or section) does not exist. </param>
+            <returns>
+              The return value should be the entry's value converted to a string, or the given default value if the entry does not exist. </returns>
+            <seealso cref="M:AMS.Profile.IReadOnlyProfile.HasEntry(System.String,System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.IReadOnlyProfile.GetValue(System.String,System.String,System.Int32)">
+            <summary>
+              Retrieves the value of an entry inside a section, or a default value if the entry does not exist. </summary>
+            <param name="section">
+              The name of the section that holds the entry with the value. </param>
+            <param name="entry">
+              The name of the entry where the value is stored. </param>
+            <param name="defaultValue">
+              The value to return if the entry (or section) does not exist. </param>
+            <returns>
+              The return value should be the entry's value converted to an integer.  If the value
+              cannot be converted, the return value should be 0.  If the entry does not exist, the
+              given default value should be returned. </returns>
+            <seealso cref="M:AMS.Profile.IReadOnlyProfile.HasEntry(System.String,System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.IReadOnlyProfile.GetValue(System.String,System.String,System.Double)">
+            <summary>
+              Retrieves the value of an entry inside a section, or a default value if the entry does not exist. </summary>
+            <param name="section">
+              The name of the section that holds the entry with the value. </param>
+            <param name="entry">
+              The name of the entry where the value is stored. </param>
+            <param name="defaultValue">
+              The value to return if the entry (or section) does not exist. </param>
+            <returns>
+              The return value should be the entry's value converted to a double.  If the value
+              cannot be converted, the return value should be 0.  If the entry does not exist, the
+              given default value should be returned. </returns>
+            <seealso cref="M:AMS.Profile.IReadOnlyProfile.HasEntry(System.String,System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.IReadOnlyProfile.GetValue(System.String,System.String,System.Boolean)">
+            <summary>
+              Retrieves the value of an entry inside a section, or a default value if the entry does not exist. </summary>
+            <param name="section">
+              The name of the section that holds the entry with the value. </param>
+            <param name="entry">
+              The name of the entry where the value is stored. </param>
+            <param name="defaultValue">
+              The value to return if the entry (or section) does not exist. </param>
+            <returns>
+              The return value should be the entry's value converted to a bool.  If the value
+              cannot be converted, the return value should be <c>false</c>.  If the entry does not exist, the
+              given default value should be returned. </returns>
+            <remarks>
+              Note: Boolean values are stored as "True" or "False". </remarks>
+            <seealso cref="M:AMS.Profile.IReadOnlyProfile.HasEntry(System.String,System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.IReadOnlyProfile.HasEntry(System.String,System.String)">
+            <summary>
+              Determines if an entry exists inside a section. </summary>
+            <param name="section">
+              The name of the section that holds the entry. </param>
+            <param name="entry">
+              The name of the entry to be checked for existence. </param>
+            <returns>
+              If the entry exists inside the section, the return value should be true; otherwise false. </returns>
+            <seealso cref="M:AMS.Profile.IReadOnlyProfile.HasSection(System.String)"/>
+            <seealso cref="M:AMS.Profile.IReadOnlyProfile.GetEntryNames(System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.IReadOnlyProfile.HasSection(System.String)">
+            <summary>
+              Determines if a section exists. </summary>
+            <param name="section">
+              The name of the section to be checked for existence. </param>
+            <returns>
+              If the section exists, the return value should be true; otherwise false. </returns>
+            <seealso cref="M:AMS.Profile.IReadOnlyProfile.HasEntry(System.String,System.String)"/>
+            <seealso cref="M:AMS.Profile.IReadOnlyProfile.GetSectionNames"/>
+        </member>
+        <member name="M:AMS.Profile.IReadOnlyProfile.GetEntryNames(System.String)">
+            <summary>
+              Retrieves the names of all the entries inside a section. </summary>
+            <param name="section">
+              The name of the section holding the entries. </param>
+            <returns>
+              If the section exists, the return value should be an array with the names of its entries; 
+              otherwise it should be null. </returns>
+            <seealso cref="M:AMS.Profile.IReadOnlyProfile.HasEntry(System.String,System.String)"/>
+            <seealso cref="M:AMS.Profile.IReadOnlyProfile.GetSectionNames"/>
+        </member>
+        <member name="M:AMS.Profile.IReadOnlyProfile.GetSectionNames">
+            <summary>
+              Retrieves the names of all the sections. </summary>
+            <returns>
+              The return value should be an array with the names of all the sections. </returns>
+            <seealso cref="M:AMS.Profile.IReadOnlyProfile.HasSection(System.String)"/>
+            <seealso cref="M:AMS.Profile.IReadOnlyProfile.GetEntryNames(System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.IReadOnlyProfile.GetDataSet">
+            <summary>
+              Retrieves a DataSet object containing every section, entry, and value in the profile. </summary>
+            <returns>
+              If the profile exists, the return value should be a DataSet object representing the profile; otherwise it's null. </returns>
+            <remarks>
+              The returned DataSet should be named using the <see cref="P:AMS.Profile.IReadOnlyProfile.Name"/> property.  
+              It should contain one table for each section, and each entry should be represented by a column inside the table.
+              Each table should contain only one row where the values will be stored corresponding to each column (entry). 
+              <para>
+              This method serves as a convenient way to extract the profile's data to this generic medium known as the DataSet.  
+              This allows it to be moved to many different places, including a different type of profile object 
+              (eg., INI to XML conversion). </para>
+            </remarks>
+        </member>
+        <member name="P:AMS.Profile.IReadOnlyProfile.Name">
+            <summary>
+              Gets the name associated with the profile. </summary>
+            <remarks>
+              This should be the name of the file where the data is stored, or something equivalent. </remarks>
+        </member>
+        <member name="M:AMS.Profile.IProfile.SetValue(System.String,System.String,System.Object)">
+            <summary>
+              Sets the value for an entry inside a section. </summary>
+            <param name="section">
+              The name of the section that holds the entry. </param>
+            <param name="entry">
+              The name of the entry where the value will be set. </param>
+            <param name="value">
+              The value to set. If it's null, the entry should be removed. </param>
+            <remarks>
+              This method should check the <see cref="P:AMS.Profile.IProfile.ReadOnly"/> property and throw an InvalidOperationException if it's true.
+              It should also raise the <see cref="E:AMS.Profile.IProfile.Changing"/> and <see cref="E:AMS.Profile.IProfile.Changed"/> events before and after the value is set. </remarks>
+            <seealso cref="M:AMS.Profile.IReadOnlyProfile.GetValue(System.String,System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.IProfile.RemoveEntry(System.String,System.String)">
+            <summary>
+              Removes an entry from a section. </summary>
+            <param name="section">
+              The name of the section that holds the entry. </param>
+            <param name="entry">
+              The name of the entry to remove. </param>
+            <remarks>
+              This method should check the <see cref="P:AMS.Profile.IProfile.ReadOnly"/> property and throw an InvalidOperationException if it's true.
+              It should also raise the <see cref="E:AMS.Profile.IProfile.Changing"/> and <see cref="E:AMS.Profile.IProfile.Changed"/> events before and after the entry is removed. </remarks>
+            <seealso cref="M:AMS.Profile.IProfile.RemoveSection(System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.IProfile.RemoveSection(System.String)">
+            <summary>
+              Removes a section. </summary>
+            <param name="section">
+              The name of the section to remove. </param>
+            <remarks>
+              This method should check the <see cref="P:AMS.Profile.IProfile.ReadOnly"/> property and throw an InvalidOperationException if it's true.
+              It should also raise the <see cref="E:AMS.Profile.IProfile.Changing"/> and <see cref="E:AMS.Profile.IProfile.Changed"/> events before and after the section is removed. </remarks>
+            <seealso cref="M:AMS.Profile.IProfile.RemoveEntry(System.String,System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.IProfile.SetDataSet(System.Data.DataSet)">
+            <summary>
+              Writes the data of every table from a DataSet into this profile. </summary>
+            <param name="ds">
+              The DataSet object containing the data to be set. </param>
+            <remarks>
+              Each table in the DataSet should be used to represent a section of the profile.  
+              Each column of each table should represent an entry.  And for each column, the corresponding value
+              of the first row is the value that should be passed to <see cref="M:AMS.Profile.IProfile.SetValue(System.String,System.String,System.Object)"/>.  
+              <para>
+              This method serves as a convenient way to take any data inside a generic DataSet and 
+              write it to any of the available profiles. </para></remarks>
+            <seealso cref="M:AMS.Profile.IReadOnlyProfile.GetDataSet"/>
+        </member>
+        <member name="M:AMS.Profile.IProfile.CloneReadOnly">
+            <summary>
+              Creates a copy of itself and makes it read-only. </summary>
+            <returns>
+              The return value should be a copy of itself as an IReadOnlyProfile object. </returns>
+            <remarks>
+              This method is meant as a convenient way to pass a read-only copy of the profile to methods 
+              that are not allowed to modify it. </remarks>
+            <seealso cref="P:AMS.Profile.IProfile.ReadOnly"/>
+        </member>
+        <member name="P:AMS.Profile.IProfile.Name">
+            <summary>
+              Gets or sets the name associated with the profile. </summary>
+            <remarks>
+              This should be the name of the file where the data is stored, or something equivalent.
+              When setting this property, the <see cref="P:AMS.Profile.IProfile.ReadOnly"/> property should be checked and if true, an InvalidOperationException should be raised.
+              The <see cref="E:AMS.Profile.IProfile.Changing"/> and <see cref="E:AMS.Profile.IProfile.Changed"/> events should be raised before and after this property is changed. </remarks>
+            <seealso cref="P:AMS.Profile.IProfile.DefaultName"/>
+        </member>
+        <member name="P:AMS.Profile.IProfile.DefaultName">
+            <summary>
+              Gets the name associated with the profile by default. </summary>
+            <remarks>
+              This is used to set the default Name of the profile and it is typically based on 
+              the name of the executable plus some extension. </remarks>
+            <seealso cref="P:AMS.Profile.IProfile.Name"/>
+        </member>
+        <member name="P:AMS.Profile.IProfile.ReadOnly">
+            <summary>
+              Gets or sets whether the profile is read-only or not. </summary>
+            <remarks>
+              A read-only profile should not allow any operations that alter sections,
+              entries, or values, such as <see cref="M:AMS.Profile.IProfile.SetValue(System.String,System.String,System.Object)"/> or <see cref="M:AMS.Profile.IProfile.RemoveEntry(System.String,System.String)"/>.  
+              Once a profile has been marked read-only, it should be allowed to go back; 
+              attempting to do so should cause an InvalidOperationException to be raised.
+              The <see cref="E:AMS.Profile.IProfile.Changing"/> and <see cref="E:AMS.Profile.IProfile.Changed"/> events should be raised before 
+              and after this property is changed. </remarks>
+            <seealso cref="M:AMS.Profile.IProfile.CloneReadOnly"/>
+            <seealso cref="T:AMS.Profile.IReadOnlyProfile"/>
+        </member>
+        <member name="E:AMS.Profile.IProfile.Changing">
+            <summary>
+              Event that should be raised just before the profile is to be changed to allow the change to be canceled. </summary>
+            <seealso cref="E:AMS.Profile.IProfile.Changed"/>
+        </member>
+        <member name="E:AMS.Profile.IProfile.Changed">
+            <summary>
+              Event that should be raised right after the profile has been changed. </summary>
+            <seealso cref="E:AMS.Profile.IProfile.Changing"/>
+        </member>
+        <member name="M:AMS.Profile.Profile.#ctor">
+            <summary>
+              Initializes a new instance of the Profile class by setting the <see cref="P:AMS.Profile.Profile.Name"/> to <see cref="P:AMS.Profile.Profile.DefaultName"/>. </summary>
+        </member>
+        <member name="M:AMS.Profile.Profile.#ctor(System.String)">
+            <summary>
+              Initializes a new instance of the Profile class by setting the <see cref="P:AMS.Profile.Profile.Name"/> to a value. </summary>
+            <param name="name">
+              The name to initialize the <see cref="P:AMS.Profile.Profile.Name"/> property with. </param>
+        </member>
+        <member name="M:AMS.Profile.Profile.#ctor(AMS.Profile.Profile)">
+            <summary>
+              Initializes a new instance of the Profile class based on another Profile object. </summary>
+            <param name="profile">
+              The Profile object whose properties and events are used to initialize the object being constructed. </param>
+        </member>
+        <member name="M:AMS.Profile.Profile.Clone">
+            <summary>
+              Retrieves a copy of itself. </summary>
+            <returns>
+              The return value is a copy of itself as an object. </returns>
+            <remarks>
+              This method needs to be implemented by derived classes. </remarks>
+            <seealso cref="M:AMS.Profile.Profile.CloneReadOnly"/>
+        </member>
+        <member name="M:AMS.Profile.Profile.SetValue(System.String,System.String,System.Object)">
+            <summary>
+              Sets the value for an entry inside a section. </summary>
+            <param name="section">
+              The name of the section that holds the entry. </param>
+            <param name="entry">
+              The name of the entry where the value will be set. </param>
+            <param name="value">
+              The value to set. If it's null, the entry should be removed. </param>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.ReadOnly"/> is true or
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty. </exception>
+            <exception cref="T:System.ArgumentNullException">
+              Either section or entry is null. </exception>
+            <remarks>
+              This method needs to be implemented by derived classes.  Check the 
+              documentation to see what other exceptions derived versions may raise.
+              See <see cref="M:AMS.Profile.IProfile.SetValue(System.String,System.String,System.Object)">IProfile.SetValue</see> for additional remarks. </remarks>
+            <seealso cref="M:AMS.Profile.Profile.GetValue(System.String,System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Profile.GetValue(System.String,System.String)">
+            <summary>
+              Retrieves the value of an entry inside a section. </summary>
+            <param name="section">
+              The name of the section that holds the entry with the value. </param>
+            <param name="entry">
+              The name of the entry where the value is stored. </param>
+            <returns>
+              The return value is the entry's value, or null if the entry does not exist. </returns>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty. </exception>
+            <exception cref="T:System.ArgumentNullException">
+              Either section or entry is null. </exception>
+            <remarks>
+              This method needs to be implemented by derived classes.  Check the 
+              documentation to see what other exceptions derived versions may raise. </remarks>
+            <seealso cref="M:AMS.Profile.Profile.SetValue(System.String,System.String,System.Object)"/>
+            <seealso cref="M:AMS.Profile.Profile.HasEntry(System.String,System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Profile.GetValue(System.String,System.String,System.String)">
+            <summary>
+              Retrieves the string value of an entry inside a section, or a default value if the entry does not exist. </summary>
+            <param name="section">
+              The name of the section that holds the entry with the value. </param>
+            <param name="entry">
+              The name of the entry where the value is stored. </param>
+            <param name="defaultValue">
+              The value to return if the entry (or section) does not exist. </param>
+            <returns>
+              The return value is the entry's value converted to a string, or the given default value if the entry does not exist. </returns>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty. </exception>
+            <exception cref="T:System.ArgumentNullException">
+              Either section or entry is null. </exception>
+            <remarks>
+              This method calls <c>GetValue(section, entry)</c> of the derived class, so check its 
+              documentation to see what other exceptions may be raised. </remarks>
+            <seealso cref="M:AMS.Profile.Profile.SetValue(System.String,System.String,System.Object)"/>
+            <seealso cref="M:AMS.Profile.Profile.HasEntry(System.String,System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Profile.GetValue(System.String,System.String,System.Int32)">
+            <summary>
+              Retrieves the integer value of an entry inside a section, or a default value if the entry does not exist. </summary>
+            <param name="section">
+              The name of the section that holds the entry with the value. </param>
+            <param name="entry">
+              The name of the entry where the value is stored. </param>
+            <param name="defaultValue">
+              The value to return if the entry (or section) does not exist. </param>
+            <returns>
+              The return value is the entry's value converted to an integer.  If the value
+              cannot be converted, the return value is 0.  If the entry does not exist, the
+              given default value is returned. </returns>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty. </exception>
+            <exception cref="T:System.ArgumentNullException">
+              Either section or entry is null. </exception>
+            <remarks>
+              This method calls <c>GetValue(section, entry)</c> of the derived class, so check its 
+              documentation to see what other exceptions may be raised. </remarks>
+            <seealso cref="M:AMS.Profile.Profile.SetValue(System.String,System.String,System.Object)"/>
+            <seealso cref="M:AMS.Profile.Profile.HasEntry(System.String,System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Profile.GetValue(System.String,System.String,System.Double)">
+            <summary>
+              Retrieves the double value of an entry inside a section, or a default value if the entry does not exist. </summary>
+            <param name="section">
+              The name of the section that holds the entry with the value. </param>
+            <param name="entry">
+              The name of the entry where the value is stored. </param>
+            <param name="defaultValue">
+              The value to return if the entry (or section) does not exist. </param>
+            <returns>
+              The return value is the entry's value converted to a double.  If the value
+              cannot be converted, the return value is 0.  If the entry does not exist, the
+              given default value is returned. </returns>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty. </exception>
+            <exception cref="T:System.ArgumentNullException">
+              Either section or entry is null. </exception>
+            <remarks>
+              This method calls <c>GetValue(section, entry)</c> of the derived class, so check its 
+              documentation to see what other exceptions may be raised. </remarks>
+            <seealso cref="M:AMS.Profile.Profile.SetValue(System.String,System.String,System.Object)"/>
+            <seealso cref="M:AMS.Profile.Profile.HasEntry(System.String,System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Profile.GetValue(System.String,System.String,System.Boolean)">
+            <summary>
+              Retrieves the bool value of an entry inside a section, or a default value if the entry does not exist. </summary>
+            <param name="section">
+              The name of the section that holds the entry with the value. </param>
+            <param name="entry">
+              The name of the entry where the value is stored. </param>
+            <param name="defaultValue">
+              The value to return if the entry (or section) does not exist. </param>
+            <returns>
+              The return value is the entry's value converted to a bool.  If the value
+              cannot be converted, the return value is <c>false</c>.  If the entry does not exist, the
+              given default value is returned. </returns>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty. </exception>
+            <exception cref="T:System.ArgumentNullException">
+              Either section or entry is null. </exception>
+            <remarks>
+              Note: Boolean values are stored as "True" or "False". 
+              <para>
+              This method calls <c>GetValue(section, entry)</c> of the derived class, so check its 
+              documentation to see what other exceptions may be raised. </para></remarks>
+            <seealso cref="M:AMS.Profile.Profile.SetValue(System.String,System.String,System.Object)"/>
+            <seealso cref="M:AMS.Profile.Profile.HasEntry(System.String,System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Profile.HasEntry(System.String,System.String)">
+            <summary>
+              Determines if an entry exists inside a section. </summary>
+            <param name="section">
+              The name of the section that holds the entry. </param>
+            <param name="entry">
+              The name of the entry to be checked for existence. </param>
+            <returns>
+              If the entry exists inside the section, the return value is true; otherwise false. </returns>
+            <exception cref="T:System.ArgumentNullException">
+              section is null. </exception>
+            <remarks>
+              This method calls GetEntryNames of the derived class, so check its 
+              documentation to see what other exceptions may be raised. </remarks>
+            <seealso cref="M:AMS.Profile.Profile.HasSection(System.String)"/>
+            <seealso cref="M:AMS.Profile.Profile.GetEntryNames(System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Profile.HasSection(System.String)">
+            <summary>
+              Determines if a section exists. </summary>
+            <param name="section">
+              The name of the section to be checked for existence. </param>
+            <returns>
+              If the section exists, the return value is true; otherwise false. </returns>
+            <seealso cref="M:AMS.Profile.Profile.HasEntry(System.String,System.String)"/>
+            <seealso cref="M:AMS.Profile.Profile.GetSectionNames"/>
+        </member>
+        <member name="M:AMS.Profile.Profile.RemoveEntry(System.String,System.String)">
+            <summary>
+              Removes an entry from a section. </summary>
+            <param name="section">
+              The name of the section that holds the entry. </param>
+            <param name="entry">
+              The name of the entry to remove. </param>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.ReadOnly"/> is true. </exception>
+            <exception cref="T:System.ArgumentNullException">
+              Either section or entry is null. </exception>
+            <remarks>
+              This method needs to be implemented by derived classes.  Check the 
+              documentation to see what other exceptions derived versions may raise.
+              See <see cref="M:AMS.Profile.IProfile.RemoveEntry(System.String,System.String)">IProfile.RemoveEntry</see> for additional remarks. </remarks>
+            <seealso cref="M:AMS.Profile.Profile.RemoveSection(System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Profile.RemoveSection(System.String)">
+            <summary>
+              Removes a section. </summary>
+            <param name="section">
+              The name of the section to remove. </param>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.ReadOnly"/> is true. </exception>
+            <exception cref="T:System.ArgumentNullException">
+              section is null. </exception>
+            <remarks>
+              This method needs to be implemented by derived classes.  Check the 
+              documentation to see what other exceptions derived versions may raise.
+              See <see cref="M:AMS.Profile.IProfile.RemoveSection(System.String)">IProfile.RemoveSection</see> for additional remarks. </remarks>
+            <seealso cref="M:AMS.Profile.Profile.RemoveEntry(System.String,System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Profile.GetEntryNames(System.String)">
+            <summary>
+              Retrieves the names of all the entries inside a section. </summary>
+            <param name="section">
+              The name of the section holding the entries. </param>
+            <returns>
+              If the section exists, the return value should be an array with the names of its entries; 
+              otherwise null. </returns>
+            <exception cref="T:System.ArgumentNullException">
+              section is null. </exception>
+            <remarks>
+              This method needs to be implemented by derived classes.  Check the 
+              documentation to see what other exceptions derived versions may raise. </remarks>
+            <seealso cref="M:AMS.Profile.Profile.HasEntry(System.String,System.String)"/>
+            <seealso cref="M:AMS.Profile.Profile.GetSectionNames"/>
+        </member>
+        <member name="M:AMS.Profile.Profile.GetSectionNames">
+            <summary>
+              Retrieves the names of all the sections. </summary>
+            <returns>
+              The return value should be an array with the names of all the sections. </returns>
+            <remarks>
+              This method needs to be implemented by derived classes.  Check the 
+              documentation to see what exceptions derived versions may raise. </remarks>
+            <seealso cref="M:AMS.Profile.Profile.HasSection(System.String)"/>
+            <seealso cref="M:AMS.Profile.Profile.GetEntryNames(System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Profile.CloneReadOnly">
+            <summary>
+              Retrieves a copy of itself and makes it read-only. </summary>
+            <returns>
+              The return value is a copy of itself as a IReadOnlyProfile object. </returns>
+            <remarks>
+              This method serves as a convenient way to pass a read-only copy of the profile to methods 
+              that are not allowed to modify it. </remarks>
+            <seealso cref="P:AMS.Profile.Profile.ReadOnly"/>
+        </member>
+        <member name="M:AMS.Profile.Profile.GetDataSet">
+            <summary>
+              Retrieves a DataSet object containing every section, entry, and value in the profile. </summary>
+            <returns>
+              If the profile exists, the return value is a DataSet object representing the profile; otherwise it's null. </returns>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty. </exception>
+            <remarks>
+              The returned DataSet will be named using the <see cref="P:AMS.Profile.Profile.Name"/> property.  
+              It will contain one table for each section, and each entry will be represented by a column inside the table.
+              Each table will contain only one row where the values will stored corresponding to each column (entry). 
+              <para>
+              This method serves as a convenient way to extract the profile's data to this generic medium known as the DataSet.  
+              This allows it to be moved to many different places, including a different type of profile object 
+              (eg., INI to XML conversion). </para>
+              <para>
+              This method calls GetSectionNames, GetEntryNames, and GetValue of the derived class, so check the 
+              documentation to see what other exceptions may be raised. </para></remarks>
+            <seealso cref="M:AMS.Profile.Profile.SetDataSet(System.Data.DataSet)"/>
+        </member>
+        <member name="M:AMS.Profile.Profile.SetDataSet(System.Data.DataSet)">
+            <summary>
+              Writes the data of every table from a DataSet into this profile. </summary>
+            <param name="ds">
+              The DataSet object containing the data to be set. </param>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.ReadOnly"/> is true or
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty. </exception>
+            <exception cref="T:System.ArgumentNullException">
+              ds is null. </exception>
+            <remarks>
+              Each table in the DataSet represents a section of the profile.  
+              Each column of each table represents an entry.  And for each column, the corresponding value
+              of the first row is the value to be passed to <see cref="M:AMS.Profile.Profile.SetValue(System.String,System.String,System.Object)"/>.  
+              Note that only the first row is imported; additional rows are ignored.
+              <para>
+              This method serves as a convenient way to take any data inside a generic DataSet and 
+              write it to any of the available profiles. </para>
+              <para>
+              This method calls SetValue of the derived class, so check its 
+              documentation to see what other exceptions may be raised. </para></remarks>
+            <seealso cref="M:AMS.Profile.Profile.GetDataSet"/>
+        </member>
+        <member name="M:AMS.Profile.Profile.VerifyAndAdjustSection(System.String@)">
+            <summary>
+              Verifies the given section name is not null and trims it. </summary>
+            <param name="section">
+              The section name to verify and adjust. </param>
+            <exception cref="T:System.ArgumentNullException">
+              section is null. </exception>
+            <remarks>
+              This method may be used by derived classes to make sure that a valid
+              section name has been passed, and to make any necessary adjustments to it
+              before passing it to the corresponding APIs. </remarks>
+            <seealso cref="M:AMS.Profile.Profile.VerifyAndAdjustEntry(System.String@)"/>
+        </member>
+        <member name="M:AMS.Profile.Profile.VerifyAndAdjustEntry(System.String@)">
+            <summary>
+              Verifies the given entry name is not null and trims it. </summary>
+            <param name="entry">
+              The entry name to verify and adjust. </param>
+            <remarks>
+              This method may be used by derived classes to make sure that a valid
+              entry name has been passed, and to make any necessary adjustments to it
+              before passing it to the corresponding APIs. </remarks>
+            <exception cref="T:System.ArgumentNullException">
+              entry is null. </exception>
+            <seealso cref="M:AMS.Profile.Profile.VerifyAndAdjustSection(System.String@)"/>
+        </member>
+        <member name="M:AMS.Profile.Profile.VerifyName">
+            <summary>
+              Verifies the Name property is not empty or null. </summary>
+            <remarks>
+              This method may be used by derived classes to make sure that the 
+              APIs are working with a valid Name (file name) </remarks>
+            <exception cref="T:System.InvalidOperationException">
+              name is empty or null. </exception>
+            <seealso cref="P:AMS.Profile.Profile.Name"/>
+        </member>
+        <member name="M:AMS.Profile.Profile.VerifyNotReadOnly">
+            <summary>
+              Verifies the ReadOnly property is not true. </summary>
+            <remarks>
+              This method may be used by derived classes as a convenient way to 
+              validate that modifications to the profile can be made. </remarks>
+            <exception cref="T:System.InvalidOperationException">
+              ReadOnly is true. </exception>
+            <seealso cref="P:AMS.Profile.Profile.ReadOnly"/>
+        </member>
+        <member name="M:AMS.Profile.Profile.RaiseChangeEvent(System.Boolean,AMS.Profile.ProfileChangeType,System.String,System.String,System.Object)">
+            <summary>
+              Raises either the Changing or Changed event. </summary>
+            <param name="changing">
+              If true, the Changing event is raised otherwise it's Changed. </param>
+            <param name="changeType">
+              The type of change being made. </param>
+            <param name="section">
+              The name of the section that was involved in the change or null if not applicable. </param>
+            <param name="entry">
+              The name of the entry that was involved in the change or null if not applicable. 
+              If changeType is equal to Other, entry is the name of the property involved in the change.</param>
+            <param name="value">
+              The value that was changed or null if not applicable. </param>
+            <returns>
+              The return value is based on the event raised.  If the Changing event was raised, 
+              the return value is the opposite of ProfileChangingArgs.Cancel; otherwise it's true.</returns>
+            <remarks>
+              This method may be used by derived classes as a convenient alternative to calling 
+              OnChanging and OnChanged.  For example, a typical call to OnChanging would require
+              four lines of code, which this method reduces to two. </remarks>
+            <seealso cref="E:AMS.Profile.Profile.Changing"/>
+            <seealso cref="E:AMS.Profile.Profile.Changed"/>
+            <seealso cref="M:AMS.Profile.Profile.OnChanging(AMS.Profile.ProfileChangingArgs)"/>
+            <seealso cref="M:AMS.Profile.Profile.OnChanged(AMS.Profile.ProfileChangedArgs)"/>
+        </member>
+        <member name="M:AMS.Profile.Profile.OnChanging(AMS.Profile.ProfileChangingArgs)">
+            <summary>
+              Raises the Changing event. </summary>
+            <param name="e">
+              The arguments object associated with the Changing event. </param>
+            <remarks>
+              This method should be invoked prior to making a change to the profile so that the
+              Changing event is raised, giving a chance to the handlers to prevent the change from
+              happening (by setting e.Cancel to true). This method calls each individual handler 
+              associated with the Changing event and checks the resulting e.Cancel flag.  
+              If it's true, it stops and does not call of any remaining handlers since the change 
+              needs to be prevented anyway. </remarks>
+            <seealso cref="E:AMS.Profile.Profile.Changing"/>
+            <seealso cref="M:AMS.Profile.Profile.OnChanged(AMS.Profile.ProfileChangedArgs)"/>
+        </member>
+        <member name="M:AMS.Profile.Profile.OnChanged(AMS.Profile.ProfileChangedArgs)">
+            <summary>
+              Raises the Changed event. </summary>
+            <param name="e">
+              The arguments object associated with the Changed event. </param>
+            <remarks>
+              This method should be invoked after a change to the profile has been made so that the
+              Changed event is raised, giving a chance to the handlers to be notified of the change. </remarks>
+            <seealso cref="E:AMS.Profile.Profile.Changed"/>
+            <seealso cref="M:AMS.Profile.Profile.OnChanging(AMS.Profile.ProfileChangingArgs)"/>
+        </member>
+        <member name="M:AMS.Profile.Profile.Test(System.Boolean)">
+            <summary>
+              Runs a test to verify this object is working as expected. </summary>
+            <param name="cleanup">
+              If true, the modifications made to the profile are cleaned up as the final part of the test. 
+              If false, the modifications are not removed thus allowing them to be examined. </param>
+            <remarks>
+              This method tests most of the funcionality of a profile object to ensure
+              accuracy and consistency.  All profile classes should behave identically when calling this method. 
+              If the test fails, an Exception is raised detailing the problem.  </remarks>
+            <exception cref="T:System.Exception">
+              The test failed. </exception>
+        </member>
+        <member name="E:AMS.Profile.Profile.Changing">
+            <summary>
+              Event used to notify that the profile is about to be changed. </summary>
+            <seealso cref="E:AMS.Profile.Profile.Changed"/>
+        </member>
+        <member name="E:AMS.Profile.Profile.Changed">
+            <summary>
+              Event used to notify that the profile has been changed. </summary>
+            <seealso cref="E:AMS.Profile.Profile.Changing"/>
+        </member>
+        <member name="P:AMS.Profile.Profile.Name">
+            <summary>
+              Gets or sets the name associated with the profile. </summary>
+            <exception cref="T:System.NullReferenceException">
+              Setting this property to null. </exception>
+            <exception cref="T:System.InvalidOperationException">
+              Setting this property if ReadOnly is true. </exception>
+            <remarks>
+              This is usually the name of the file where the data is stored. 
+              The <see cref="E:AMS.Profile.Profile.Changing"/> event is raised before changing this property.  
+              If its <see cref="P:AMS.Profile.ProfileChangingArgs.Cancel"/> property is set to true, this property 
+              returns immediately without being changed.  After the property is changed, 
+              the <see cref="E:AMS.Profile.Profile.Changed"/> event is raised. </remarks>
+            <seealso cref="P:AMS.Profile.Profile.DefaultName"/>
+        </member>
+        <member name="P:AMS.Profile.Profile.ReadOnly">
+            <summary>
+              Gets or sets whether the profile is read-only or not. </summary>
+            <exception cref="T:System.InvalidOperationException">
+              Setting this property if it's already true. </exception>
+            <remarks>
+              A read-only profile does not allow any operations that alter sections,
+              entries, or values, such as <see cref="M:AMS.Profile.Profile.SetValue(System.String,System.String,System.Object)"/> or <see cref="M:AMS.Profile.Profile.RemoveEntry(System.String,System.String)"/>.  
+              Once a profile has been marked read-only, it may no longer go back; 
+              attempting to do so causes an InvalidOperationException to be raised.
+              The <see cref="E:AMS.Profile.Profile.Changing"/> event is raised before changing this property.  
+              If its <see cref="P:AMS.Profile.ProfileChangingArgs.Cancel"/> property is set to true, this property 
+              returns immediately without being changed.  After the property is changed, 
+              the <see cref="E:AMS.Profile.Profile.Changed"/> event is raised. </remarks>
+            <seealso cref="M:AMS.Profile.Profile.CloneReadOnly"/>
+            <seealso cref="T:AMS.Profile.IReadOnlyProfile"/>
+        </member>
+        <member name="P:AMS.Profile.Profile.DefaultName">
+            <summary>
+              Gets the name associated with the profile by default. </summary>
+            <remarks>
+              This property needs to be implemented by derived classes.  
+              See <see cref="P:AMS.Profile.IProfile.DefaultName">IProfile.DefaultName</see> for additional remarks. </remarks>
+            <seealso cref="P:AMS.Profile.Profile.Name"/>
+        </member>
+        <member name="P:AMS.Profile.Profile.DefaultNameWithoutExtension">
+            <summary>
+              Gets the name of the file to be used as the default, without the profile-specific extension. </summary>
+            <remarks>
+              This property is used by file-based Profile implementations 
+              when composing the DefaultName.  These implementations take the value returned by this
+              property and add their own specific extension (.ini, .xml, .config, etc.).
+              <para>
+              For Windows applications, this property returns the full path of the executable.  
+              For Web applications, this returns the full path of the web.config file without 
+              the .config extension.  </para></remarks>
+            <seealso cref="P:AMS.Profile.Profile.DefaultName"/>
+        </member>
+        <member name="M:AMS.Profile.XmlBased.#ctor">
+            <summary>
+              Initializes a new instance of the XmlBased class by setting the <see cref="P:AMS.Profile.Profile.Name"/> to <see cref="P:AMS.Profile.Profile.DefaultName"/>. </summary>
+        </member>
+        <member name="M:AMS.Profile.XmlBased.#ctor(System.String)">
+            <summary>
+              Initializes a new instance of the XmlBased class by setting the <see cref="P:AMS.Profile.Profile.Name"/> to the given file name. </summary>
+            <param name="fileName">
+              The name of the file to initialize the <see cref="P:AMS.Profile.Profile.Name"/> property with. </param>
+        </member>
+        <member name="M:AMS.Profile.XmlBased.#ctor(AMS.Profile.XmlBased)">
+            <summary>
+              Initializes a new instance of the XmlBased class based on another XmlBased object. </summary>
+            <param name="profile">
+              The XmlBased profile object whose properties and events are used to initialize the object being constructed. </param>
+        </member>
+        <member name="M:AMS.Profile.XmlBased.GetXmlDocument">
+            <summary>
+              Retrieves an XmlDocument object based on the <see cref="P:AMS.Profile.Profile.Name"/> of the file. </summary>
+            <returns>
+              If <see cref="P:AMS.Profile.XmlBased.Buffering"/> is not enabled, the return value is the XmlDocument object loaded with the file, 
+              or null if the file does not exist. If <see cref="P:AMS.Profile.XmlBased.Buffering"/> is enabled, the return value is an 
+              XmlDocument object, which will be loaded with the file if it already exists.</returns>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty. </exception>
+            <exception cref="T:System.Xml.XmlException">
+              Parse error in the XML being loaded from the file. </exception>
+        </member>
+        <member name="M:AMS.Profile.XmlBased.Save(System.Xml.XmlDocument)">
+            <summary>
+              Saves any changes pending on an XmlDocument object, unless <see cref="P:AMS.Profile.XmlBased.Buffering"/> is enabled. </summary>
+            <exception cref="T:System.Xml.XmlException">
+              The resulting XML document would not be well formed. </exception>
+            <remarks>
+              If <see cref="P:AMS.Profile.XmlBased.Buffering"/> is enabled, this method sets the <see cref="P:AMS.Profile.XmlBuffer.NeedsFlushing"/> property to true 
+              and the changes are not saved until the buffer is flushed (or closed).  If the Buffer is not active
+              the contents of the XmlDocument object are saved to the file. </remarks>
+        </member>
+        <member name="M:AMS.Profile.XmlBased.Buffer(System.Boolean)">
+            <summary>
+              Activates buffering on this XML-based profile object, if not already active. </summary>
+            <param name="lockFile">
+              If true, the file is locked when the buffer is activated so that no other processes can write to it.  
+              If false, other processes can continue writing to it and the actual contents of the file can get 
+              out of synch with the contents of the buffer. </param>
+            <returns>
+              The return value is an <see cref="T:AMS.Profile.XmlBuffer"/> object that may be used to control the buffer used
+              to read/write values from this XmlBased profile.  </returns>
+            <exception cref="T:System.InvalidOperationException">
+              Attempting to lock the file  and the name is null or empty. </exception>
+            <exception cref="T:System.Security.SecurityException">
+              Attempting to lock the file without the required permission. </exception>
+            <exception cref="T:System.UnauthorizedAccessException">
+              Attempting to lock the file and ReadWrite access is not permitted by the operating system. </exception>
+            <remarks>
+              <i>Buffering</i> is the caching of an <see cref="T:System.Xml.XmlDocument"/> object so that subsequent reads or writes
+              are all done through it.  This dramatically increases the performance of those operations, but it requires
+              that the buffer is flushed (or closed) to commit any changes done to the underlying file.
+              <para>
+              The XmlBuffer object is created and attached to this XmlBased profile object, if not already present.
+              If it is already attached, the same object is returned in subsequent calls, until the object is closed. </para>
+              <para>
+              Since the XmlBuffer class implements <see cref="T:System.IDisposable"/>, the <c>using</c> keyword in C# can be 
+              used to conveniently create the buffer, write to it, and then automatically flush it (when it's disposed).  
+              Here's an example:
+              <code> 
+              using (profile.Buffer(true))
+              {
+                 profile.SetValue("A Section", "An Entry", "A Value");
+                 profile.SetValue("A Section", "Another Entry", "Another Value");
+                 ...
+              }
+              </code></para></remarks>
+            <seealso cref="T:AMS.Profile.XmlBuffer"/>
+            <seealso cref="P:AMS.Profile.XmlBased.Buffering"/>
+        </member>
+        <member name="M:AMS.Profile.XmlBased.Buffer">
+            <summary>
+              Activates <i>locked</i> buffering on this XML-based profile object, if not already active. </summary>
+            <returns>
+              The return value is an <see cref="T:AMS.Profile.XmlBuffer"/> object that may be used to control the buffer used
+              to read/write values from this XmlBased profile.  </returns>
+            <exception cref="T:System.InvalidOperationException">
+              Attempting to lock the file  and the name is null or empty. </exception>
+            <exception cref="T:System.Security.SecurityException">
+              Attempting to lock the file without the required permission. </exception>
+            <exception cref="T:System.UnauthorizedAccessException">
+              Attempting to lock the file and ReadWrite access is not permitted by the operating system. </exception>
+            <remarks>
+              <i>Buffering</i> refers to the caching of an <see cref="T:System.Xml.XmlDocument"/> object so that subsequent reads or writes
+              are all done through it.  This dramatically increases the performance of those operations, but it requires
+              that the buffer is flushed (or closed) to commit any changes done to the underlying file.
+              <para>
+              The XmlBuffer object is created and attached to this XmlBased profile object, if not already present.
+              If it is already attached, the same object is returned in subsequent calls, until the object is closed. </para>
+              <para>
+              If the buffer is created, the underlying file (if any) is locked so that no other processes 
+              can write to it. This is equivalent to calling Buffer(true). </para>
+              <para>
+              Since the XmlBuffer class implements <see cref="T:System.IDisposable"/>, the <c>using</c> keyword in C# can be 
+              used to conveniently create the buffer, write to it, and then automatically flush it (when it's disposed).  
+              Here's an example:
+              <code> 
+              using (profile.Buffer())
+              {
+                 profile.SetValue("A Section", "An Entry", "A Value");
+                 profile.SetValue("A Section", "Another Entry", "Another Value");
+                 ...
+              }
+              </code></para></remarks>
+            <seealso cref="T:AMS.Profile.XmlBuffer"/>
+            <seealso cref="P:AMS.Profile.XmlBased.Buffering"/>
+        </member>
+        <member name="P:AMS.Profile.XmlBased.Buffering">
+            <summary>
+              Gets whether buffering is active or not. </summary>
+            <remarks>
+              <i>Buffering</i> is the caching of an <see cref="T:System.Xml.XmlDocument"/> object so that subsequent reads or writes
+              are all done through it.  This dramatically increases the performance of those operations, but it requires
+              that the buffer is flushed (or closed) to commit any changes done to the underlying file.
+              <para>
+              This property may be used to determine if the buffer is active without actually activating it.  
+              The <see cref="M:AMS.Profile.XmlBased.Buffer(System.Boolean)"/> method activates the buffer, which then needs to be flushed (or closed) to update the file. </para></remarks>
+            <seealso cref="M:AMS.Profile.XmlBased.Buffer(System.Boolean)"/>
+            <seealso cref="T:AMS.Profile.XmlBuffer"/>
+        </member>
+        <member name="P:AMS.Profile.XmlBased.Encoding">
+            <summary>
+              Gets or sets the encoding, to be used if the file is created. </summary>
+            <exception cref="T:System.InvalidOperationException">
+              Setting this property if <see cref="P:AMS.Profile.Profile.ReadOnly"/> is true. </exception>
+            <remarks>
+              By default this property is set to <see cref="P:System.Text.Encoding.UTF8">Encoding.UTF8</see>, but it is only 
+              used when the file is not found and needs to be created to write the value. 
+              If the file exists, the existing encoding is used and this value is ignored. 
+              The <see cref="E:AMS.Profile.Profile.Changing"/> event is raised before changing this property.  
+              If its <see cref="P:AMS.Profile.ProfileChangingArgs.Cancel"/> property is set to true, this method 
+              returns immediately without changing this property.  After the property has been changed, 
+              the <see cref="E:AMS.Profile.Profile.Changed"/> event is raised. </remarks>
+        </member>
+        <member name="M:AMS.Profile.Config.#ctor">
+            <summary>
+              Initializes a new instance of the Config class by setting the <see cref="P:AMS.Profile.Profile.Name"/> to <see cref="P:AMS.Profile.Profile.DefaultName"/>. </summary>
+        </member>
+        <member name="M:AMS.Profile.Config.#ctor(System.String)">
+            <summary>
+              Initializes a new instance of the Config class by setting the <see cref="P:AMS.Profile.Profile.Name"/> to the given file name. </summary>
+            <param name="fileName">
+              The name of the Config file to initialize the <see cref="P:AMS.Profile.Profile.Name"/> property with. </param>
+        </member>
+        <member name="M:AMS.Profile.Config.#ctor(AMS.Profile.Config)">
+            <summary>
+              Initializes a new instance of the Config class based on another Config object. </summary>
+            <param name="config">
+              The Config object whose properties and events are used to initialize the object being constructed. </param>
+        </member>
+        <member name="M:AMS.Profile.Config.Clone">
+            <summary>
+              Retrieves a copy of itself. </summary>
+            <returns>
+              The return value is a copy of itself as an object. </returns>
+            <seealso cref="M:AMS.Profile.Profile.CloneReadOnly"/>
+        </member>
+        <member name="M:AMS.Profile.Config.IsAppSettings(System.String)">
+            <summary>
+              Retrieves whether we don't have a valid GroupName and a given section is 
+              equal to "appSettings". </summary>
+            <remarks>
+              This method helps us determine whether we need to deal with the "configuration\configSections" element. </remarks>
+        </member>
+        <member name="M:AMS.Profile.Config.VerifyAndAdjustSection(System.String@)">
+            <summary>
+              Verifies the given section name is not null and trims it. </summary>
+            <param name="section">
+              The section name to verify and adjust. </param>
+            <exception cref="T:System.ArgumentNullException">
+              section is null. </exception>
+            <remarks>
+              This method first calls <see cref="M:AMS.Profile.Profile.VerifyAndAdjustSection(System.String@)">Profile.VerifyAndAdjustSection</see> 
+              and then replaces any spaces in the section with underscores.  This is needed 
+              because XML element names may not contain spaces.  </remarks>
+            <seealso cref="M:AMS.Profile.Profile.VerifyAndAdjustEntry(System.String@)"/>
+        </member>
+        <member name="M:AMS.Profile.Config.SetValue(System.String,System.String,System.Object)">
+            <summary>
+              Sets the value for an entry inside a section. </summary>
+            <param name="section">
+              The name of the section that holds the entry. </param>
+            <param name="entry">
+              The name of the entry where the value will be set. </param>
+            <param name="value">
+              The value to set. If it's null, the entry is removed. </param>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty, 
+              <see cref="P:AMS.Profile.Profile.ReadOnly"/> is true, or
+              the resulting XML document is invalid. </exception>
+            <exception cref="T:System.ArgumentNullException">
+              Either section or entry is null. </exception>
+            <exception cref="T:System.Xml.XmlException">
+              Parse error in the XML being loaded from the file or
+              the resulting XML document would not be well formed. </exception>
+            <remarks>
+              If the Config file does not exist, it is created.
+              The <see cref="E:AMS.Profile.Profile.Changing"/> event is raised before setting the value.  
+              If its <see cref="P:AMS.Profile.ProfileChangingArgs.Cancel"/> property is set to true, this method 
+              returns immediately without setting the value.  After the value has been set, 
+              the <see cref="E:AMS.Profile.Profile.Changed"/> event is raised.
+              <para>
+              Note: If <see cref="P:AMS.Profile.XmlBased.Buffering"/> is enabled, the value is not actually written to the
+              Config file until the buffer is flushed (or closed). </para></remarks>
+            <seealso cref="M:AMS.Profile.Config.GetValue(System.String,System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Config.GetValue(System.String,System.String)">
+            <summary>
+              Retrieves the value of an entry inside a section. </summary>
+            <param name="section">
+              The name of the section that holds the entry with the value. </param>
+            <param name="entry">
+              The name of the entry where the value is stored. </param>
+            <returns>
+              The return value is the entry's value, or null if the entry does not exist. </returns>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty. </exception>
+            <exception cref="T:System.ArgumentNullException">
+              Either section or entry is null. </exception>
+            <exception cref="T:System.Xml.XmlException">
+              Parse error in the XML being loaded from the file. </exception>
+            <exception cref="T:System.NullReferenceException">
+              'value' attribute is missing from the entry node. </exception>
+            <seealso cref="M:AMS.Profile.Config.SetValue(System.String,System.String,System.Object)"/>
+            <seealso cref="M:AMS.Profile.Profile.HasEntry(System.String,System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Config.RemoveEntry(System.String,System.String)">
+            <summary>
+              Removes an entry from a section. </summary>
+            <param name="section">
+              The name of the section that holds the entry. </param>
+            <param name="entry">
+              The name of the entry to remove. </param>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty or
+              <see cref="P:AMS.Profile.Profile.ReadOnly"/> is true. </exception>
+            <exception cref="T:System.ArgumentNullException">
+              Either section or entry is null. </exception>
+            <exception cref="T:System.Xml.XmlException">
+              Parse error in the XML being loaded from the file or
+              the resulting XML document would not be well formed. </exception>
+            <remarks>
+              The <see cref="E:AMS.Profile.Profile.Changing"/> event is raised before removing the entry.  
+              If its <see cref="P:AMS.Profile.ProfileChangingArgs.Cancel"/> property is set to true, this method 
+              returns immediately without removing the entry.  After the entry has been removed, 
+              the <see cref="E:AMS.Profile.Profile.Changed"/> event is raised. 
+              <para>
+              Note: If <see cref="P:AMS.Profile.XmlBased.Buffering"/> is enabled, the entry is not removed from the
+              Config file until the buffer is flushed (or closed). </para></remarks>
+            <seealso cref="M:AMS.Profile.Config.RemoveSection(System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Config.RemoveSection(System.String)">
+            <summary>
+              Removes a section. </summary>
+            <param name="section">
+              The name of the section to remove. </param>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty or
+              <see cref="P:AMS.Profile.Profile.ReadOnly"/> is true. </exception>
+            <exception cref="T:System.ArgumentNullException">
+              section is null. </exception>
+            <exception cref="T:System.Xml.XmlException">
+              Parse error in the XML being loaded from the file or
+              the resulting XML document would not be well formed. </exception>
+            <remarks>
+              The <see cref="E:AMS.Profile.Profile.Changing"/> event is raised before removing the section.  
+              If its <see cref="P:AMS.Profile.ProfileChangingArgs.Cancel"/> property is set to true, this method 
+              returns immediately without removing the section.  After the section has been removed, 
+              the <see cref="E:AMS.Profile.Profile.Changed"/> event is raised.
+              <para>
+              Note: If <see cref="P:AMS.Profile.XmlBased.Buffering"/> is enabled, the section is not removed from the
+              Config file until the buffer is flushed (or closed). </para></remarks>
+            <seealso cref="M:AMS.Profile.Config.RemoveEntry(System.String,System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Config.GetEntryNames(System.String)">
+            <summary>
+              Retrieves the names of all the entries inside a section. </summary>
+            <param name="section">
+              The name of the section holding the entries. </param>
+            <returns>
+              If the section exists, the return value is an array with the names of its entries; 
+              otherwise it's null. </returns>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty. </exception>
+            <exception cref="T:System.ArgumentNullException">
+              section is null. </exception>
+            <exception cref="T:System.Xml.XmlException">
+              Parse error in the XML being loaded from the file. </exception>
+            <seealso cref="M:AMS.Profile.Profile.HasEntry(System.String,System.String)"/>
+            <seealso cref="M:AMS.Profile.Config.GetSectionNames"/>
+        </member>
+        <member name="M:AMS.Profile.Config.GetSectionNames">
+            <summary>
+              Retrieves the names of all the sections. </summary>
+            <returns>
+              If the Config file exists, the return value is an array with the names of all the sections;
+              otherwise it's null. </returns>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty. </exception>
+            <exception cref="T:System.Xml.XmlException">
+              Parse error in the XML being loaded from the file. </exception>
+            <seealso cref="M:AMS.Profile.Profile.HasSection(System.String)"/>
+            <seealso cref="M:AMS.Profile.Config.GetEntryNames(System.String)"/>
+        </member>
+        <member name="P:AMS.Profile.Config.DefaultName">
+            <summary>
+              Gets the default name for the Config file. </summary>
+            <remarks>
+              For Windows apps, this property returns the name of the executable plus .config ("program.exe.config").
+              For Web apps, this property returns the full path of the <i>web.config</i> file.
+              This property is used to set the <see cref="P:AMS.Profile.Profile.Name"/> property inside the default constructor.</remarks>
+        </member>
+        <member name="P:AMS.Profile.Config.GroupName">
+            <summary>
+              Gets or sets the name of the element under which all sections should be located. </summary>
+            <exception cref="T:System.InvalidOperationException">
+              Setting this property if <see cref="P:AMS.Profile.Profile.ReadOnly"/> is true. </exception>
+            <exception cref="T:System.Xml.XmlException">
+              The value being set contains an namespace prefix (eg, <b>prefix:</b>whatever). </exception>
+            <remarks>
+              By default this property is set to "profile".  This means that the sections come as
+              descendants of "configuration\profile".  However, this property may be set to null so that
+              all sections can be placed directly under "configuration".  This is useful for reading/writing
+              the popular "appSettings" section, which may also be retrieved via the System.Configuration.ConfigurationSettings.AppSettings property.
+              <para>The <see cref="E:AMS.Profile.Profile.Changing"/> event is raised before changing this property.  
+              If its <see cref="P:AMS.Profile.ProfileChangingArgs.Cancel"/> property is set to true, this method 
+              returns immediately without changing this property.  After the property has been changed, 
+              the <see cref="E:AMS.Profile.Profile.Changed"/> event is raised.</para> </remarks>
+        </member>
+        <member name="P:AMS.Profile.Config.HasGroupName">
+            <summary>
+              Gets whether we have a valid GroupName. </summary>
+        </member>
+        <member name="P:AMS.Profile.Config.GroupNameSlash">
+            <summary>
+              Gets the name of the GroupName plus a slash or an empty string is HasGroupName is false. </summary>
+            <remarks>
+              This property helps us when retrieving sections. </remarks>
+        </member>
+        <member name="T:AMS.Profile.ProfileChangeType">
+            <summary>
+              Types of changes that may be made to a Profile object. </summary>
+            <remarks>
+              A variable of this type is passed inside the ProfileChangedArgs object 
+              for the <see cref="E:AMS.Profile.Profile.Changing"/> and <see cref="E:AMS.Profile.Profile.Changed"/> events </remarks>
+            <seealso cref="T:AMS.Profile.ProfileChangedArgs"/>
+        </member>
+        <member name="F:AMS.Profile.ProfileChangeType.Name">
+            <summary> 
+              The change refers to the <see cref="P:AMS.Profile.Profile.Name"/> property. </summary>		
+            <remarks> 
+              <see cref="P:AMS.Profile.ProfileChangedArgs.Value"/> will contain the new name. </remarks>
+        </member>
+        <member name="F:AMS.Profile.ProfileChangeType.ReadOnly">
+            <summary> 
+              The change refers to the <see cref="P:AMS.Profile.Profile.ReadOnly"/> property. </summary>		
+            <remarks> 
+              <see cref="P:AMS.Profile.ProfileChangedArgs.Value"/> will be true. </remarks>
+        </member>
+        <member name="F:AMS.Profile.ProfileChangeType.SetValue">
+            <summary> 
+              The change refers to the <see cref="M:AMS.Profile.Profile.SetValue(System.String,System.String,System.Object)"/> method. </summary>		
+            <remarks> 
+              <see cref="P:AMS.Profile.ProfileChangedArgs.Section"/>,  <see cref="P:AMS.Profile.ProfileChangedArgs.Entry"/>, 
+              and <see cref="P:AMS.Profile.ProfileChangedArgs.Value"/> will be set to the same values passed 
+              to the SetValue method. </remarks>
+        </member>
+        <member name="F:AMS.Profile.ProfileChangeType.RemoveEntry">
+            <summary> 
+              The change refers to the <see cref="M:AMS.Profile.Profile.RemoveEntry(System.String,System.String)"/> method. </summary>		
+            <remarks> 
+              <see cref="P:AMS.Profile.ProfileChangedArgs.Section"/> and <see cref="P:AMS.Profile.ProfileChangedArgs.Entry"/> 
+              will be set to the same values passed to the RemoveEntry method. </remarks>
+        </member>
+        <member name="F:AMS.Profile.ProfileChangeType.RemoveSection">
+            <summary> 
+              The change refers to the <see cref="M:AMS.Profile.Profile.RemoveSection(System.String)"/> method. </summary>		
+            <remarks> 
+              <see cref="P:AMS.Profile.ProfileChangedArgs.Section"/> will contain the name of the section passed to the RemoveSection method. </remarks>
+        </member>
+        <member name="F:AMS.Profile.ProfileChangeType.Other">
+            <summary> 
+              The change refers to method or property specific to the Profile class. </summary>		
+            <remarks> 
+              <see cref="P:AMS.Profile.ProfileChangedArgs.Entry"/> will contain the name of the  method or property.
+              <see cref="P:AMS.Profile.ProfileChangedArgs.Value"/> will contain the new value. </remarks>
+        </member>
+        <member name="T:AMS.Profile.ProfileChangedArgs">
+            <summary>
+              EventArgs class to be passed as the second parameter of a <see cref="E:AMS.Profile.Profile.Changed"/> event handler. </summary>
+            <remarks>
+              This class provides all the information relevant to the change made to the Profile.
+              It is also used as a convenient base class for the ProfileChangingArgs class which is passed 
+              as the second parameter of the <see cref="E:AMS.Profile.Profile.Changing"/> event handler. </remarks>
+            <seealso cref="T:AMS.Profile.ProfileChangingArgs"/>
+        </member>
+        <member name="M:AMS.Profile.ProfileChangedArgs.#ctor(AMS.Profile.ProfileChangeType,System.String,System.String,System.Object)">
+            <summary>
+              Initializes a new instance of the ProfileChangedArgs class by initializing all of its properties. </summary>
+            <param name="changeType">
+              The type of change made to the profile. </param>
+            <param name="section">
+              The name of the section involved in the change or null. </param>
+            <param name="entry">
+              The name of the entry involved in the change, or if changeType is set to Other, the name of the method/property that was changed. </param>
+            <param name="value">
+              The new value for the entry or method/property, based on the value of changeType. </param>
+            <seealso cref="T:AMS.Profile.ProfileChangeType"/>
+        </member>
+        <member name="P:AMS.Profile.ProfileChangedArgs.ChangeType">
+            <summary>
+              Gets the type of change that raised the event. </summary>
+        </member>
+        <member name="P:AMS.Profile.ProfileChangedArgs.Section">
+            <summary>
+              Gets the name of the section involved in the change, or null if not applicable. </summary>
+        </member>
+        <member name="P:AMS.Profile.ProfileChangedArgs.Entry">
+            <summary>
+              Gets the name of the entry involved in the change, or null if not applicable. </summary>
+            <remarks> 
+              If <see cref="P:AMS.Profile.ProfileChangedArgs.ChangeType"/> is set to Other, this property holds the name of the 
+              method/property that was changed. </remarks>
+        </member>
+        <member name="P:AMS.Profile.ProfileChangedArgs.Value">
+            <summary>
+              Gets the new value for the entry or method/property, based on the value of <see cref="P:AMS.Profile.ProfileChangedArgs.ChangeType"/>. </summary>
+        </member>
+        <member name="T:AMS.Profile.ProfileChangingArgs">
+            <summary>
+              EventArgs class to be passed as the second parameter of a <see cref="E:AMS.Profile.Profile.Changing"/> event handler. </summary>
+            <remarks>
+              This class provides all the information relevant to the change about to be made to the Profile.
+              Besides the properties of ProfileChangedArgs, it adds the Cancel property which allows the 
+              event handler to prevent the change from happening. </remarks>
+            <seealso cref="T:AMS.Profile.ProfileChangedArgs"/>
+        </member>
+        <member name="M:AMS.Profile.ProfileChangingArgs.#ctor(AMS.Profile.ProfileChangeType,System.String,System.String,System.Object)">
+            <summary>
+              Initializes a new instance of the ProfileChangingArgs class by initializing all of its properties. </summary>
+            <param name="changeType">
+              The type of change to be made to the profile. </param>
+            <param name="section">
+              The name of the section involved in the change or null. </param>
+            <param name="entry">
+              The name of the entry involved in the change, or if changeType is set to Other, the name of the method/property that was changed. </param>
+            <param name="value">
+              The new value for the entry or method/property, based on the value of changeType. </param>
+            <seealso cref="T:AMS.Profile.ProfileChangeType"/>
+        </member>
+        <member name="P:AMS.Profile.ProfileChangingArgs.Cancel">
+            <summary>
+              Gets or sets whether the change about to the made should be canceled or not. </summary>
+            <remarks> 
+              By default this property is set to false, meaning that the change is allowed.  </remarks>
+        </member>
+        <member name="T:AMS.Profile.ProfileChangingHandler">
+            <summary>
+              Definition of the <see cref="E:AMS.Profile.Profile.Changing"/> event handler. </summary>
+            <remarks>
+              This definition complies with the .NET Framework's standard for event handlers.
+              The sender is always set to the Profile object that raised the event. </remarks>
+        </member>
+        <member name="T:AMS.Profile.ProfileChangedHandler">
+            <summary>
+              Definition of the <see cref="E:AMS.Profile.Profile.Changed"/> event handler. </summary>
+            <remarks>
+              This definition complies with the .NET Framework's standard for event handlers.
+              The sender is always set to the Profile object that raised the event. </remarks>
+        </member>
+        <member name="T:AMS.Profile.Ini">
+            <summary>
+              Profile class that utilizes an INI-formatted file to retrieve and save its data. </summary>
+            <remarks>
+              This class works with INI files, which use a simple two-dimensional text format of sections
+              and entries to organize their data.  Here's a sample of the format:
+              <code>
+              [A Section]
+              An Entry=Some Value
+              Another Entry=Another Value
+                
+              [Another Section]
+              This is cool=True
+              </code>
+              This class utilizes the <see cref="M:AMS.Profile.Ini.GetPrivateProfileString(System.String,System.String,System.String,System.Text.StringBuilder,System.Int32,System.String)"/> and <see cref="M:AMS.Profile.Ini.WritePrivateProfileString(System.String,System.String,System.String,System.String)"/> Win32 APIs
+              to read and write the INI file.</remarks>
+        </member>
+        <member name="M:AMS.Profile.Ini.#ctor">
+            <summary>
+              Initializes a new instance of the Ini class by setting the <see cref="P:AMS.Profile.Profile.Name"/> to <see cref="P:AMS.Profile.Profile.DefaultName"/>. </summary>
+        </member>
+        <member name="M:AMS.Profile.Ini.#ctor(System.String)">
+            <summary>
+              Initializes a new instance of the Ini class by setting the <see cref="P:AMS.Profile.Profile.Name"/> to the given file name. </summary>
+            <param name="fileName">
+              The name of the INI file to initialize the <see cref="P:AMS.Profile.Profile.Name"/> property with. </param>
+        </member>
+        <member name="M:AMS.Profile.Ini.#ctor(AMS.Profile.Ini)">
+            <summary>
+              Initializes a new instance of the Ini class based on another Ini object. </summary>
+            <param name="ini">
+              The Ini object whose properties and events are used to initialize the object being constructed. </param>
+        </member>
+        <member name="M:AMS.Profile.Ini.Clone">
+            <summary>
+              Retrieves a copy of itself. </summary>
+            <returns>
+              The return value is a copy of itself as an object. </returns>
+            <seealso cref="M:AMS.Profile.Profile.CloneReadOnly"/>
+        </member>
+        <member name="M:AMS.Profile.Ini.SetValue(System.String,System.String,System.Object)">
+            <summary>
+              Sets the value for an entry inside a section. </summary>
+            <param name="section">
+              The name of the section that holds the entry. </param>
+            <param name="entry">
+              The name of the entry where the value will be set. </param>
+            <param name="value">
+              The value to set. If it's null, the entry is removed. </param>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.ReadOnly"/> is true or
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty. </exception>
+            <exception cref="T:System.ArgumentNullException">
+              Either section or entry is null. </exception>
+            <exception cref="T:System.ComponentModel.Win32Exception">
+              The <see cref="M:AMS.Profile.Ini.WritePrivateProfileString(System.String,System.String,System.String,System.String)"/> API failed. </exception>
+            <remarks>
+              If the INI file does not exist, it is created.
+              The <see cref="E:AMS.Profile.Profile.Changing"/> event is raised before setting the value.  
+              If its <see cref="P:AMS.Profile.ProfileChangingArgs.Cancel"/> property is set to true, this method 
+              returns immediately without setting the value.  After the value has been set, 
+              the <see cref="E:AMS.Profile.Profile.Changed"/> event is raised. </remarks>
+            <seealso cref="M:AMS.Profile.Ini.GetValue(System.String,System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Ini.GetValue(System.String,System.String)">
+            <summary>
+              Retrieves the value of an entry inside a section. </summary>
+            <param name="section">
+              The name of the section that holds the entry with the value. </param>
+            <param name="entry">
+              The name of the entry where the value is stored. </param>
+            <returns>
+              The return value is the entry's value, or null if the entry does not exist. </returns>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty. </exception>
+            <exception cref="T:System.ArgumentNullException">
+              Either section or entry is null. </exception>
+            <seealso cref="M:AMS.Profile.Ini.SetValue(System.String,System.String,System.Object)"/>
+            <seealso cref="M:AMS.Profile.Profile.HasEntry(System.String,System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Ini.RemoveEntry(System.String,System.String)">
+            <summary>
+              Removes an entry from a section. </summary>
+            <param name="section">
+              The name of the section that holds the entry. </param>
+            <param name="entry">
+              The name of the entry to remove. </param>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty or
+              <see cref="P:AMS.Profile.Profile.ReadOnly"/> is true. </exception>
+            <exception cref="T:System.ArgumentNullException">
+              Either section or entry is null. </exception>
+            <exception cref="T:System.ComponentModel.Win32Exception">
+              The <see cref="M:AMS.Profile.Ini.WritePrivateProfileString(System.String,System.String,System.String,System.String)"/> API failed. </exception>
+            <remarks>
+              The <see cref="E:AMS.Profile.Profile.Changing"/> event is raised before removing the entry.  
+              If its <see cref="P:AMS.Profile.ProfileChangingArgs.Cancel"/> property is set to true, this method 
+              returns immediately without removing the entry.  After the entry has been removed, 
+              the <see cref="E:AMS.Profile.Profile.Changed"/> event is raised. </remarks>
+            <seealso cref="M:AMS.Profile.Ini.RemoveSection(System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Ini.RemoveSection(System.String)">
+            <summary>
+              Removes a section. </summary>
+            <param name="section">
+              The name of the section to remove. </param>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty or
+              <see cref="P:AMS.Profile.Profile.ReadOnly"/> is true. </exception>
+            <exception cref="T:System.ArgumentNullException">
+              section is null. </exception>
+            <exception cref="T:System.ComponentModel.Win32Exception">
+              The <see cref="M:AMS.Profile.Ini.WritePrivateProfileString(System.String,System.String,System.String,System.String)"/> API failed. </exception>
+            <remarks>
+              The <see cref="E:AMS.Profile.Profile.Changing"/> event is raised before removing the section.  
+              If its <see cref="P:AMS.Profile.ProfileChangingArgs.Cancel"/> property is set to true, this method 
+              returns immediately without removing the section.  After the section has been removed, 
+              the <see cref="E:AMS.Profile.Profile.Changed"/> event is raised. </remarks>
+            <seealso cref="M:AMS.Profile.Ini.RemoveEntry(System.String,System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Ini.GetEntryNames(System.String)">
+            <summary>
+              Retrieves the names of all the entries inside a section. </summary>
+            <param name="section">
+              The name of the section holding the entries. </param>
+            <returns>
+              If the section exists, the return value is an array with the names of its entries; 
+              otherwise it's null. </returns>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty. </exception>
+            <seealso cref="M:AMS.Profile.Profile.HasEntry(System.String,System.String)"/>
+            <seealso cref="M:AMS.Profile.Ini.GetSectionNames"/>
+        </member>
+        <member name="M:AMS.Profile.Ini.GetSectionNames">
+            <summary>
+              Retrieves the names of all the sections. </summary>
+            <returns>
+              If the INI file exists, the return value is an array with the names of all the sections;
+              otherwise it's null. </returns>
+            <seealso cref="M:AMS.Profile.Profile.HasSection(System.String)"/>
+            <seealso cref="M:AMS.Profile.Ini.GetEntryNames(System.String)"/>
+        </member>
+        <member name="P:AMS.Profile.Ini.DefaultName">
+            <summary>
+              Gets the default name for the INI file. </summary>
+            <remarks>
+              For Windows apps, this property returns the name of the executable plus .ini ("program.exe.ini").
+              For Web apps, this property returns the full path of <i>web.ini</i> based on the root folder.
+              This property is used to set the <see cref="P:AMS.Profile.Profile.Name"/> property inside the default constructor.</remarks>
+        </member>
+        <member name="T:AMS.Profile.Registry">
+            <summary>
+              Profile class that utilizes the Windows Registry to retrieve and save its data. </summary>
+            <remarks>
+              By default class this class uses the HKEY_CURRENT_USER root key,
+              and sets its default subkey based on the CompanyName and ProductName properties of
+              the Application object.  For the Demo application, the Company name is set to
+              "AMS" and the product is "ProfileDemo".  So the entire path looks like this:
+            
+              <code>HKEY_CURRENT_USER\Software\AMS\ProfileDemo</code>
+            
+              Each section is then created as a subkey of this location on the registry. </remarks>
+        </member>
+        <member name="M:AMS.Profile.Registry.#ctor">
+            <summary>
+              Initializes a new instance of the Registry class by setting the <see cref="P:AMS.Profile.Profile.Name"/> to <see cref="P:AMS.Profile.Profile.DefaultName"/>. </summary>
+        </member>
+        <member name="M:AMS.Profile.Registry.#ctor(Microsoft.Win32.RegistryKey,System.String)">
+            <summary>
+              Initializes a new instance of the Registry class by setting the <see cref="P:AMS.Profile.Registry.RootKey"/> and/or <see cref="P:AMS.Profile.Profile.Name"/>. </summary>
+            <param name="rootKey">
+              If not null, this is used to initialize the <see cref="P:AMS.Profile.Registry.RootKey"/> property. </param>
+            <param name="subKeyName">
+              If not null, this is used to initialize the <see cref="P:AMS.Profile.Profile.Name"/> property. </param>
+        </member>
+        <member name="M:AMS.Profile.Registry.#ctor(AMS.Profile.Registry)">
+            <summary>
+              Initializes a new instance of the Registry class based on another Registry object. </summary>
+            <param name="reg">
+              The Registry object whose properties and events are used to initialize the object being constructed. </param>
+        </member>
+        <member name="M:AMS.Profile.Registry.Clone">
+            <summary>
+              Retrieves a copy of itself. </summary>
+            <returns>
+              The return value is a copy of itself as an object. </returns>
+            <seealso cref="M:AMS.Profile.Profile.CloneReadOnly"/>
+        </member>
+        <member name="M:AMS.Profile.Registry.GetSubKey(System.String,System.Boolean,System.Boolean)">
+            <summary>
+              Retrieves a RegistryKey object for the given section. </summary>
+            <param name="section">
+              The name of the section to retrieve the key for. </param>
+            <param name="create">
+              If true, the key is created if necessary; otherwise it is just opened. </param>
+            <param name="writable">
+              If true the key is opened with write access; otherwise it is opened read-only. </param>
+            <returns>
+              The return value is a RegistryKey object representing the section's subkey. </returns>
+            <exception cref="T:System.ArgumentException">
+              The length of <i>Name\section</i> is longer than 255 characters. </exception>
+            <exception cref="T:System.Security.SecurityException">
+              The user does not have RegistryPermission.SetInclude(create, currentKey) or RegistryPermission.SetInclude(open, currentKey) access. </exception>
+            <exception cref="T:System.UnauthorizedAccessException">
+              The registry key cannot be written to (for example, it was opened as an unwritable key) </exception>
+            <remarks>
+              This method returns a key for the equivalent path: <see cref="P:AMS.Profile.Registry.RootKey"/> + "\\" + <see cref="P:AMS.Profile.Profile.Name"/> + "\\" + section </remarks>
+        </member>
+        <member name="M:AMS.Profile.Registry.SetValue(System.String,System.String,System.Object)">
+            <summary>
+              Sets the value for an entry inside a section. </summary>
+            <param name="section">
+              The name of the section that holds the entry. </param>
+            <param name="entry">
+              The name of the entry where the value will be set. </param>
+            <param name="value">
+              The value to set. If it's null, the entry is removed. </param>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.ReadOnly"/> is true or
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty. </exception>
+            <exception cref="T:System.ArgumentNullException">
+              Either section or entry is null, or 
+              the length of <i>Name\section</i> is longer than 255 characters. </exception>
+            <exception cref="T:System.Security.SecurityException">
+              The user does not have RegistryPermission.SetInclude(create, currentKey) or RegistryPermission.SetInclude(open, currentKey) access. </exception>
+            <exception cref="T:System.UnauthorizedAccessException">
+              The registry key cannot be written to (for example, it was opened as an unwritable key) </exception>
+            <remarks>
+              If either the subkey, section, or entry does not exist, it is created.
+              The <see cref="E:AMS.Profile.Profile.Changing"/> event is raised before setting the value.  
+              If its <see cref="P:AMS.Profile.ProfileChangingArgs.Cancel"/> property is set to true, this method 
+              returns immediately without setting the value.  After the value has been set, 
+              the <see cref="E:AMS.Profile.Profile.Changed"/> event is raised. </remarks>
+            <seealso cref="M:AMS.Profile.Registry.GetValue(System.String,System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Registry.GetValue(System.String,System.String)">
+            <summary>
+              Retrieves the value of an entry inside a section. </summary>
+            <param name="section">
+              The name of the section that holds the entry with the value. </param>
+            <param name="entry">
+              The name of the entry where the value is stored. </param>
+            <returns>
+              The return value is the entry's value, or null if the entry does not exist. </returns>
+            <exception cref="T:System.ArgumentNullException">
+              Either section or entry is null, or 
+              the length of <i>Name\section</i> is longer than 255 characters. </exception>
+            <exception cref="T:System.Security.SecurityException">
+              The user does not have RegistryPermission.SetInclude(delete, currentKey) access. </exception>
+            <exception cref="T:System.UnauthorizedAccessException">
+              The registry key cannot be written to (for example, it was opened as an unwritable key) </exception>
+            <seealso cref="M:AMS.Profile.Registry.SetValue(System.String,System.String,System.Object)"/>
+            <seealso cref="M:AMS.Profile.Profile.HasEntry(System.String,System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Registry.RemoveEntry(System.String,System.String)">
+            <summary>
+              Removes an entry from a section. </summary>
+            <param name="section">
+              The name of the section that holds the entry. </param>
+            <param name="entry">
+              The name of the entry to remove. </param>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.ReadOnly"/> is true. </exception>
+            <exception cref="T:System.ArgumentNullException">
+              Either section or entry is null, or 
+              the length of <i>Name\section</i> is longer than 255 characters. </exception>
+            <exception cref="T:System.Security.SecurityException">
+              The user does not have RegistryPermission.SetInclude(create, currentKey) or RegistryPermission.SetInclude(open, currentKey) access. </exception>
+            <exception cref="T:System.UnauthorizedAccessException">
+              The registry key cannot be written to (for example, it was opened as an unwritable key) </exception>
+            <remarks>
+              The <see cref="E:AMS.Profile.Profile.Changing"/> event is raised before removing the entry.  
+              If its <see cref="P:AMS.Profile.ProfileChangingArgs.Cancel"/> property is set to true, this method 
+              returns immediately without removing the entry.  After the entry has been removed, 
+              the <see cref="E:AMS.Profile.Profile.Changed"/> event is raised. </remarks>
+            <seealso cref="M:AMS.Profile.Registry.RemoveSection(System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Registry.RemoveSection(System.String)">
+            <summary>
+              Removes a section. </summary>
+            <param name="section">
+              The name of the section to remove. </param>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.ReadOnly"/> is true. </exception>
+            <exception cref="T:System.ArgumentNullException">
+              section is null or 
+              the length of <i>Name\section</i> is longer than 255 characters. </exception>
+            <exception cref="T:System.Security.SecurityException">
+              The user does not have RegistryPermission.SetInclude(create, currentKey) or RegistryPermission.SetInclude(open, currentKey) access. </exception>
+            <exception cref="T:System.UnauthorizedAccessException">
+              The registry key cannot be written to (for example, it was opened as an unwritable key) </exception>
+            <remarks>
+              The <see cref="E:AMS.Profile.Profile.Changing"/> event is raised before removing the section.  
+              If its <see cref="P:AMS.Profile.ProfileChangingArgs.Cancel"/> property is set to true, this method 
+              returns immediately without removing the section.  After the section has been removed, 
+              the <see cref="E:AMS.Profile.Profile.Changed"/> event is raised. </remarks>
+            <seealso cref="M:AMS.Profile.Registry.RemoveEntry(System.String,System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Registry.GetEntryNames(System.String)">
+            <summary>
+              Retrieves the names of all the entries inside a section. </summary>
+            <param name="section">
+              The name of the section holding the entries. </param>
+            <exception cref="T:System.ArgumentNullException">
+              section is null or 
+              the length of <i>Name\section</i> is longer than 255 characters. </exception>
+            <exception cref="T:System.Security.SecurityException">
+              The user does not have RegistryPermission.SetInclude(delete, currentKey) access. </exception>
+            <exception cref="T:System.UnauthorizedAccessException">
+              The registry key cannot be written to (for example, it was opened as an unwritable key) </exception>
+            <returns>
+              If the section exists, the return value is an array with the names of its entries; 
+              otherwise it's null. </returns>
+            <seealso cref="M:AMS.Profile.Profile.HasEntry(System.String,System.String)"/>
+            <seealso cref="M:AMS.Profile.Registry.GetSectionNames"/>
+        </member>
+        <member name="M:AMS.Profile.Registry.GetSectionNames">
+            <summary>
+              Retrieves the names of all the sections. </summary>
+            <returns>
+              If the XML file exists, the return value is an array with the names of all the sections;
+              otherwise it's null. </returns>
+            <exception cref="T:System.ArgumentNullException">
+              The length of the section is longer than 255 characters. </exception>
+            <exception cref="T:System.Security.SecurityException">
+              The user does not have RegistryPermission.SetInclude(delete, currentKey) access. </exception>
+            <seealso cref="M:AMS.Profile.Profile.HasSection(System.String)"/>
+            <seealso cref="M:AMS.Profile.Registry.GetEntryNames(System.String)"/>
+        </member>
+        <member name="P:AMS.Profile.Registry.DefaultName">
+            <summary>
+              Gets the default name sub-key registry path. </summary>
+            <exception cref="T:System.InvalidOperationException">
+              Application.CompanyName or Application.ProductName are empty.</exception>
+            <remarks>
+              This is set to "Software\\" + Application.CompanyName + "\\" + Application.ProductName. </remarks>
+        </member>
+        <member name="P:AMS.Profile.Registry.RootKey">
+            <summary>
+              Gets or sets the root RegistryKey object to use as the base for the <see cref="P:AMS.Profile.Profile.Name"/>. </summary>
+            <exception cref="T:System.InvalidOperationException">
+              Setting this property if <see cref="P:AMS.Profile.Profile.ReadOnly"/> is true. </exception>
+            <remarks>
+              By default, this property is set to Microsoft.Win32.Registry.CurrentUser. 
+              The <see cref="E:AMS.Profile.Profile.Changing"/> event is raised before changing this property.  
+              If its <see cref="P:AMS.Profile.ProfileChangingArgs.Cancel"/> property is set to true, this method 
+              returns immediately without changing this property.  After the property has been changed, 
+              the <see cref="E:AMS.Profile.Profile.Changed"/> event is raised. </remarks>
+        </member>
+        <member name="T:AMS.Profile.Xml">
+            <summary>
+              Profile class that utilizes an XML file to retrieve and save its data. </summary>
+            <remarks>
+              This class works with XML files, which are text files that store their data using XML. 
+              Since the format of XML is very flexible, I had to decide how to best organize the data
+              using the section/entry paradigm.  After considering a couple of possibilities, 
+              I decided that the format below would be preferrable, since it allows section and 
+              entry names to contain spaces.  It also looks cleaner and more consistent than if I had
+              used the section and entry names themselves to name the elements.
+              <para>
+              Here's an illustration of the format: </para>
+              <code>
+              &lt;?xml version="1.0" encoding="utf-8"?&gt;
+              &lt;profile&gt;
+                &lt;section name="A Section"&gt;
+                  &lt;entry name="An Entry"&gt;Some Value&lt;/entry&gt;
+                  &lt;entry name="Another Entry"&gt;Another Value&lt;/entry&gt;
+                &lt;/section&gt;
+                &lt;section name="Another Section"&gt;
+                  &lt;entry name="This is cool"&gt;True&lt;/entry&gt;
+                &lt;/section&gt;
+              &lt;/profile&gt;
+              </code></remarks>
+        </member>
+        <member name="M:AMS.Profile.Xml.#ctor">
+            <summary>
+              Initializes a new instance of the Xml class by setting the <see cref="P:AMS.Profile.Profile.Name"/> to <see cref="P:AMS.Profile.Profile.DefaultName"/>. </summary>
+        </member>
+        <member name="M:AMS.Profile.Xml.#ctor(System.String)">
+            <summary>
+              Initializes a new instance of the Xml class by setting the <see cref="P:AMS.Profile.Profile.Name"/> to the given file name. </summary>
+            <param name="fileName">
+              The name of the XML file to initialize the <see cref="P:AMS.Profile.Profile.Name"/> property with. </param>
+        </member>
+        <member name="M:AMS.Profile.Xml.#ctor(AMS.Profile.Xml)">
+            <summary>
+              Initializes a new instance of the Xml class based on another Xml object. </summary>
+            <param name="xml">
+              The Xml object whose properties and events are used to initialize the object being constructed. </param>
+        </member>
+        <member name="M:AMS.Profile.Xml.Clone">
+            <summary>
+              Retrieves a copy of itself. </summary>
+            <returns>
+              The return value is a copy of itself as an object. </returns>
+            <seealso cref="M:AMS.Profile.Profile.CloneReadOnly"/>
+        </member>
+        <member name="M:AMS.Profile.Xml.GetSectionsPath(System.String)">
+            <summary>
+              Retrieves the XPath string used for retrieving a section from the XML file. </summary>
+            <returns>
+              An XPath string. </returns>
+            <seealso cref="M:AMS.Profile.Xml.GetEntryPath(System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Xml.GetEntryPath(System.String)">
+            <summary>
+              Retrieves the XPath string used for retrieving an entry from the XML file. </summary>
+            <returns>
+              An XPath string. </returns>
+            <seealso cref="M:AMS.Profile.Xml.GetSectionsPath(System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Xml.SetValue(System.String,System.String,System.Object)">
+            <summary>
+              Sets the value for an entry inside a section. </summary>
+            <param name="section">
+              The name of the section that holds the entry. </param>
+            <param name="entry">
+              The name of the entry where the value will be set. </param>
+            <param name="value">
+              The value to set. If it's null, the entry is removed. </param>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty, 
+              <see cref="P:AMS.Profile.Profile.ReadOnly"/> is true, or
+              the resulting XML document is invalid. </exception>
+            <exception cref="T:System.ArgumentNullException">
+              Either section or entry is null. </exception>
+            <exception cref="T:System.Xml.XmlException">
+              Parse error in the XML being loaded from the file or
+              the resulting XML document would not be well formed. </exception>
+            <remarks>
+              If the XML file does not exist, it is created, unless <see cref="P:AMS.Profile.XmlBased.Buffering"/> is enabled.
+              The <see cref="E:AMS.Profile.Profile.Changing"/> event is raised before setting the value.  
+              If its <see cref="P:AMS.Profile.ProfileChangingArgs.Cancel"/> property is set to true, this method 
+              returns immediately without setting the value.  After the value has been set, 
+              the <see cref="E:AMS.Profile.Profile.Changed"/> event is raised. 
+              <para>
+              Note: If <see cref="P:AMS.Profile.XmlBased.Buffering"/> is enabled, the value is not actually written to the
+              XML file until the buffer is flushed (or closed). </para></remarks>
+            <seealso cref="M:AMS.Profile.Xml.GetValue(System.String,System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Xml.GetValue(System.String,System.String)">
+            <summary>
+              Retrieves the value of an entry inside a section. </summary>
+            <param name="section">
+              The name of the section that holds the entry with the value. </param>
+            <param name="entry">
+              The name of the entry where the value is stored. </param>
+            <returns>
+              The return value is the entry's value, or null if the entry does not exist. </returns>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty. </exception>
+            <exception cref="T:System.ArgumentNullException">
+              Either section or entry is null. </exception>
+            <exception cref="T:System.Xml.XmlException">
+              Parse error in the XML being loaded from the file. </exception>
+            <seealso cref="M:AMS.Profile.Xml.SetValue(System.String,System.String,System.Object)"/>
+            <seealso cref="M:AMS.Profile.Profile.HasEntry(System.String,System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Xml.RemoveEntry(System.String,System.String)">
+            <summary>
+              Removes an entry from a section. </summary>
+            <param name="section">
+              The name of the section that holds the entry. </param>
+            <param name="entry">
+              The name of the entry to remove. </param>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty or
+              <see cref="P:AMS.Profile.Profile.ReadOnly"/> is true. </exception>
+            <exception cref="T:System.ArgumentNullException">
+              Either section or entry is null. </exception>
+            <exception cref="T:System.Xml.XmlException">
+              Parse error in the XML being loaded from the file or
+              the resulting XML document would not be well formed. </exception>
+            <remarks>
+              The <see cref="E:AMS.Profile.Profile.Changing"/> event is raised before removing the entry.  
+              If its <see cref="P:AMS.Profile.ProfileChangingArgs.Cancel"/> property is set to true, this method 
+              returns immediately without removing the entry.  After the entry has been removed, 
+              the <see cref="E:AMS.Profile.Profile.Changed"/> event is raised.
+              <para>
+              Note: If <see cref="P:AMS.Profile.XmlBased.Buffering"/> is enabled, the entry is not removed from the
+              XML file until the buffer is flushed (or closed). </para></remarks>
+            <seealso cref="M:AMS.Profile.Xml.RemoveSection(System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Xml.RemoveSection(System.String)">
+            <summary>
+              Removes a section. </summary>
+            <param name="section">
+              The name of the section to remove. </param>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty or
+              <see cref="P:AMS.Profile.Profile.ReadOnly"/> is true. </exception>
+            <exception cref="T:System.ArgumentNullException">
+              section is null. </exception>
+            <exception cref="T:System.Xml.XmlException">
+              Parse error in the XML being loaded from the file or
+              the resulting XML document would not be well formed. </exception>
+            <remarks>
+              The <see cref="E:AMS.Profile.Profile.Changing"/> event is raised before removing the section.  
+              If its <see cref="P:AMS.Profile.ProfileChangingArgs.Cancel"/> property is set to true, this method 
+              returns immediately without removing the section.  After the section has been removed, 
+              the <see cref="E:AMS.Profile.Profile.Changed"/> event is raised.
+              <para>
+              Note: If <see cref="P:AMS.Profile.XmlBased.Buffering"/> is enabled, the section is not removed from the
+              XML file until the buffer is flushed (or closed). </para></remarks>
+            <seealso cref="M:AMS.Profile.Xml.RemoveEntry(System.String,System.String)"/>
+        </member>
+        <member name="M:AMS.Profile.Xml.GetEntryNames(System.String)">
+            <summary>
+              Retrieves the names of all the entries inside a section. </summary>
+            <param name="section">
+              The name of the section holding the entries. </param>
+            <returns>
+              If the section exists, the return value is an array with the names of its entries; 
+              otherwise it's null. </returns>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty. </exception>
+            <exception cref="T:System.ArgumentNullException">
+              section is null. </exception>
+            <exception cref="T:System.Xml.XmlException">
+              Parse error in the XML being loaded from the file. </exception>
+            <seealso cref="M:AMS.Profile.Profile.HasEntry(System.String,System.String)"/>
+            <seealso cref="M:AMS.Profile.Xml.GetSectionNames"/>
+        </member>
+        <member name="M:AMS.Profile.Xml.GetSectionNames">
+            <summary>
+              Retrieves the names of all the sections. </summary>
+            <returns>
+              If the XML file exists, the return value is an array with the names of all the sections;
+              otherwise it's null. </returns>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty. </exception>
+            <exception cref="T:System.Xml.XmlException">
+              Parse error in the XML being loaded from the file. </exception>
+            <seealso cref="M:AMS.Profile.Profile.HasSection(System.String)"/>
+            <seealso cref="M:AMS.Profile.Xml.GetEntryNames(System.String)"/>
+        </member>
+        <member name="P:AMS.Profile.Xml.DefaultName">
+            <summary>
+              Gets the default name for the XML file. </summary>
+            <remarks>
+              For Windows apps, this property returns the name of the executable plus .xml ("program.exe.xml").
+              For Web apps, this property returns the full path of <i>web.xml</i> based on the root folder.
+              This property is used to set the <see cref="P:AMS.Profile.Profile.Name"/> property inside the default constructor.</remarks>
+        </member>
+        <member name="P:AMS.Profile.Xml.RootName">
+            <summary>
+              Gets or sets the name of the root element, to be used if the file is created. </summary>
+            <exception cref="T:System.InvalidOperationException">
+              Setting this property if <see cref="P:AMS.Profile.Profile.ReadOnly"/> is true. </exception>
+            <exception cref="T:System.NullReferenceException">
+              Setting this property to null. </exception>
+            <remarks>
+              By default this property is set to "profile", but it is only used when the file 
+              is not found and needs to be created to write the value. 
+              If the file exists, the name of the root element inside the file is ignored. 
+              The <see cref="E:AMS.Profile.Profile.Changing"/> event is raised before changing this property.  
+              If its <see cref="P:AMS.Profile.ProfileChangingArgs.Cancel"/> property is set to true, this method 
+              returns immediately without changing this property.  After the property has been changed, 
+              the <see cref="E:AMS.Profile.Profile.Changed"/> event is raised. </remarks>
+        </member>
+        <member name="T:AMS.Profile.XmlBuffer">
+            <summary>
+              Buffer class for all <see cref="T:AMS.Profile.XmlBased"/> Profile classes. </summary>
+            <remarks>
+              This class provides buffering functionality for the <see cref="T:AMS.Profile.XmlBased"/> classes.
+              <i>Buffering</i> refers to the caching of an <see cref="P:AMS.Profile.XmlBuffer.XmlDocument"/> object so that subsequent reads or writes
+              are all done through it.  This dramatically increases the performance of those operations, but it requires
+              that the buffer is flushed (or closed) to commit any changes done to the underlying file. 
+              <para>
+              Since an XmlBased object can only have one buffer attached to it at a time, this class may not
+              be instanciated directly.  Instead, use the <see cref="M:AMS.Profile.XmlBased.Buffer(System.Boolean)"/> method of the profile object. </para></remarks>
+            <seealso cref="M:AMS.Profile.XmlBased.Buffer(System.Boolean)"/>
+        </member>
+        <member name="M:AMS.Profile.XmlBuffer.#ctor(AMS.Profile.XmlBased,System.Boolean)">
+            <summary>
+              Initializes a new instance of the XmlBuffer class and optionally locks the file. </summary>
+            <param name="profile">
+              The XmlBased object to associate with the buffer and to assign this object to. </param>
+            <param name="lockFile">
+              If true and the file exists, the file is locked to prevent other processes from writing to it
+              until the buffer is closed. </param>
+            <exception cref="T:System.InvalidOperationException">
+              Attempting to lock the file  and the name is null or empty. </exception>
+            <exception cref="T:System.Security.SecurityException">
+              Attempting to lock the file without the required permission. </exception>
+            <exception cref="T:System.UnauthorizedAccessException">
+              Attempting to lock the file and ReadWrite access is not permitted by the operating system. </exception>
+        </member>
+        <member name="M:AMS.Profile.XmlBuffer.Load(System.Xml.XmlTextWriter)">
+            <summary>
+              Loads the XmlDocument object with the contents of an XmlTextWriter object. </summary>
+            <param name="writer">
+              The XmlTextWriter object to load the XmlDocument with. </param>
+            <remarks>
+              This method is used to load the buffer with new data. </remarks>
+        </member>
+        <member name="M:AMS.Profile.XmlBuffer.Flush">
+            <summary>
+              Writes the contents of the XmlDocument object to the file associated with this buffer's profile. </summary>
+            <remarks>
+              This method may be used to explictly commit any changes made to the <see cref="T:AMS.Profile.XmlBased"/> profile from the time 
+              the buffer was last flushed or created.  It writes the contents of the XmlDocument object to the profile's file.
+              When the buffer is being closed (with <see cref="M:AMS.Profile.XmlBuffer.Close"/> or <see cref="M:AMS.Profile.XmlBuffer.Dispose"/>) this method is 
+              called if <see cref="P:AMS.Profile.XmlBuffer.NeedsFlushing"/> is true. After the buffer is closed, this method may not be called. </remarks>
+            <exception cref="T:System.InvalidOperationException">
+              This object is closed. </exception>
+            <seealso cref="M:AMS.Profile.XmlBuffer.Close"/>
+            <seealso cref="M:AMS.Profile.XmlBuffer.Reset"/>
+        </member>
+        <member name="M:AMS.Profile.XmlBuffer.Reset">
+            <summary>
+              Resets the buffer by discarding its XmlDocument object. </summary>
+            <remarks>
+              This method may be used to rollback any changes made to the <see cref="T:AMS.Profile.XmlBased"/> profile from the time 
+              the buffer was last flushed or created. After the buffer is closed, this method may not be called. </remarks>
+            <exception cref="T:System.InvalidOperationException">
+              This object is closed. </exception>
+            <seealso cref="M:AMS.Profile.XmlBuffer.Flush"/>
+            <seealso cref="M:AMS.Profile.XmlBuffer.Close"/>
+        </member>
+        <member name="M:AMS.Profile.XmlBuffer.Close">
+            <summary>
+              Closes the buffer by flushing the contents of its XmlDocument object (if necessary) and dettaching itself 
+              from its <see cref="T:AMS.Profile.XmlBased"/> profile. </summary>
+            <remarks>
+              This method may be used to explictly deactivate the <see cref="T:AMS.Profile.XmlBased"/> profile buffer. 
+              This means that the buffer is flushed (if <see cref="P:AMS.Profile.XmlBuffer.NeedsFlushing"/> is true) and it gets 
+              dettached from the profile. The <see cref="M:AMS.Profile.XmlBuffer.Dispose"/> method automatically calls this method. </remarks>
+            <seealso cref="M:AMS.Profile.XmlBuffer.Flush"/>
+            <seealso cref="M:AMS.Profile.XmlBuffer.Dispose"/>
+        </member>
+        <member name="M:AMS.Profile.XmlBuffer.Dispose">
+            <summary>
+              Disposes of this object's resources by closing the buffer. </summary>
+            <remarks>
+              This method calls <see cref="M:AMS.Profile.XmlBuffer.Close"/>, which flushes the buffer and dettaches it from the profile. </remarks>
+            <seealso cref="M:AMS.Profile.XmlBuffer.Close"/>
+            <seealso cref="M:AMS.Profile.XmlBuffer.Flush"/>
+        </member>
+        <member name="P:AMS.Profile.XmlBuffer.XmlDocument">
+            <summary>
+              Gets the XmlDocument object associated with this buffer, based on the profile's Name. </summary>
+            <exception cref="T:System.InvalidOperationException">
+              <see cref="P:AMS.Profile.Profile.Name"/> is null or empty. </exception>
+            <exception cref="T:System.Xml.XmlException">
+              Parse error in the XML being loaded from the file. </exception>
+        </member>
+        <member name="P:AMS.Profile.XmlBuffer.IsEmpty">
+            <summary>
+              Gets whether the buffer's XmlDocument object is empty. </summary>
+        </member>
+        <member name="P:AMS.Profile.XmlBuffer.NeedsFlushing">
+            <summary>
+              Gets whether changes have been made to the XmlDocument object that require
+              the buffer to be flushed so that the file gets updated. </summary>
+            <remarks>
+              This property returns true when the XmlDocument object has been changed and the 
+              <see cref="M:AMS.Profile.XmlBuffer.Flush"/> (or <see cref="M:AMS.Profile.XmlBuffer.Close"/>) method needs to be called to 
+              update the file. </remarks>
+            <seealso cref="M:AMS.Profile.XmlBuffer.Flush"/>
+            <seealso cref="M:AMS.Profile.XmlBuffer.Close"/>
+        </member>
+        <member name="P:AMS.Profile.XmlBuffer.Locked">
+            <summary>
+              Gets whether the file associated with the buffer's profile is locked. </summary>
+            <remarks>
+              This property returns true when this object has been created with the <i>lockFile</i> parameter set to true,
+              provided the file exists.  When locked, other processes will not be allowed to write to the profile's
+              file until the buffer is closed. </remarks>
+            <seealso cref="M:AMS.Profile.XmlBuffer.Close"/>
+        </member>
+    </members>
+</doc>

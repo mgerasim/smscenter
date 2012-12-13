@@ -1,0 +1,8 @@
+
+@@CR\base\core\i_run.sql CR\compile\src\pkg_error.spc
+@@CR\base\core\i_run.sql CR\compile\src\pkg_error.bdy
+# @@CR\base\core\i_run.sql CR\compile\src\pkg_gate.pkg
+@@CR\base\core\i_run.sql CR\compile\src\PKG_WEB.pck
+@@CR\base\core\i_run.sql CR\compile\src\PKG_STAT.pck
+
+exit

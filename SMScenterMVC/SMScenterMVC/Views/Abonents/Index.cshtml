@@ -1,0 +1,87 @@
+﻿@{
+    /*
+ * Дата         Задание     Ответственный       Комментарий
+ * 2012-05-02   R0021       Герасимов           Справочник абонентов
+ * 2012-05-21   R0031       Герасимов           Замена Descriprion на Description
+ */
+ }
+@model IEnumerable<SMScenterMVC.Models.AbonentModel>
+
+@{
+    ViewBag.Title = "Справочник абонентов";
+}
+
+<h2>Справочник абонентов</h2>
+
+<table class="stat_param" width="100%">
+    <tr>
+        <td align="right">
+            @Html.ActionLink("Создать абонента", "Create")
+        </td>
+    </tr>
+</table>
+<table>
+    <tr>
+        <th>#</th>
+        <th>
+            Имя
+        </th>
+        <th>
+            Телефон
+        </th>
+        <th>
+            Должность
+        </th>
+        <th>
+            Электронный адрес
+        </th>
+        @{/*@if (HttpContext.Current.User.Identity.Name.Split('|')[2] == "3"){}*/}
+        <th>
+            Филиал
+        </th>
+        <th colspan="2"></th>
+    </tr>
+@{int i = 0;}
+@foreach (var item in Model)
+{
+    <tr>@{i += 1;
+        <td align="right">@i</td>}
+        <td nowrap="nowrap">
+            @item.Name
+        </td>
+        <td>
+            @item.Phone
+        </td>
+		
+        <td>
+            @item.Description
+        </td>
+		
+        <td>
+            @item.Email
+        </td>
+
+        <td align="center">
+            @item.Branche
+        </td>
+        <td align="center">
+            @{/*Html.ActionLink("&nbsp", "Edit", new { id = item.ID }, new { @class = "btn_img_add" }) |
+               @Html.ActionLink("Просмотр", "Details", new { id=item.ID }) |
+            @Html.ActionLink(" ", "Edit", new { id = item.ID }, new { @class = "btn_img_edit" })
+            @Html.ActionLink(" ", "Delete", new { id = item.ID }, new { @class = "btn_img_del" })*/}
+            <a href="@Url.Action("Edit", new { id = item.ID })">
+                <img alt="Редактировать" title="Редактировать" src="@Url.Content("~/Content/themes/rtc_style/images/btn_edit_c.png")" width="20px" height="20px" border="none" />
+            </a>
+        </td>
+        <td align="center">
+            <a href="@Url.Action("Delete", new { id = item.ID })" onclick = "return confirm('Пользователь будет удален из всех групп, в которых состоит!\nВы действительно хотите удалить пользователя?');">
+                <img alt="Удалить" title="Удалить" src="@Url.Content("~/Content/themes/rtc_style/images/btn_del_c.png")" width="20px" height="20px" border="none" />
+            </a>
+            @{/*Html.ActionLink(" ", "Delete", new { id = item.ID }, new { @class = "btn_img_del", onclick = "return confirm('Вы действительно хотите удалить пользователя?');" })}*/}
+        </td>
+    </tr>
+}
+
+</table>
+
+

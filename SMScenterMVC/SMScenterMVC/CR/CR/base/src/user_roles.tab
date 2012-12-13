@@ -1,0 +1,12 @@
+create table USER_ROLES
+(
+  ID          NUMBER not null,
+  NAME        VARCHAR2(50),
+  DESCRIPTION VARCHAR2(250),
+  USER_ID     NUMBER,
+  UPDATE_AT   DATE
+)
+;
+alter table USER_ROLES
+  add constraint PK_USER_ROLES primary key (ID);
+

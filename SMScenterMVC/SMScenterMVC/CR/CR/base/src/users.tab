@@ -1,0 +1,23 @@
+create table USERS
+(
+  ID         NUMBER(38) not null,
+  LOGIN      VARCHAR2(255 CHAR),
+  CREATED_AT DATE,
+  UPDATED_AT DATE,
+  NAME       VARCHAR2(250),
+  ROLE_ID    NUMBER,
+  BRANCHE_ID NUMBER,
+  IS_DELETED NUMBER default 0
+)
+;
+alter table USERS
+  add primary key (ID);
+alter table USERS
+  add constraint UK_LOGIN unique (LOGIN);
+alter table USERS
+  add constraint FK_BRANCHE foreign key (BRANCHE_ID)
+  references BRANCHES (ID);
+alter table USERS
+  add constraint FK_USER_ROLES foreign key (ROLE_ID)
+  references USER_ROLES (ID);
+

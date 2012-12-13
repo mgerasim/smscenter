@@ -1,0 +1,43 @@
+﻿@{
+/*
+ * Дата         Задание     Ответственный       Комментарий
+ * 2012-06-07   R0040       Герасимов           Получение техподдержки из БД
+ */
+}
+@{
+    ViewBag.Title = "Поддержка";
+}
+
+<h2>Поддержка</h2>
+<p>
+     Cопровождением данного веб-ресурса занимаются:<br /><br />
+     <table>
+     <tr>
+     <tr>
+     <th>Сотрудник</th>
+     <th>Телефон</th>
+     <th>Электронный адрес</th>
+     </tr>
+
+     @foreach (var item in Model)
+     {
+         <tr>
+         <td>@item.Name</td>
+         <td>@item.Phone</td>
+         <td><a href='mailto:@item.email'>@item.email</a></td>
+         </tr>
+     
+     }
+     </table>
+</p>
+<table class="stat_param" width="100%">
+    <tr>
+        <td align="right">
+            <img alt="Внимание" src="@Url.Content("~/Content/themes/rtc_style/images/warning.png")" width="30px" height="30px" border="none" />
+        </td>
+        <td>
+            Если у Вас есть какие-либо пожелания или предложения,<br />Вы можете оставить 
+            @Html.ActionLink("сообщение", "ContactUs", "Home", null, new { @class = "openDialog", data_dialog_id = "emailDialog", data_dialog_title = "Написать пожелание" }) или, напрямую, связаться с разработчиками по телефону и электронной почте.
+        </td>
+    </tr>
+</table>

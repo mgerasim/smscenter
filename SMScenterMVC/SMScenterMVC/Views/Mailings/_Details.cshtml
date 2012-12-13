@@ -1,0 +1,63 @@
+﻿@model IEnumerable<SMScenterMVC.Models.DetailMailing>
+
+<!--<tr id="@ViewBag.ElmId">-->
+
+<td id="@ViewBag.ElmId" colspan="4" style="border-style: none; border-width: 0px; padding-left: 10px">
+@Ajax.ActionLink("Закрыть", "Details_empty", new { id = ViewBag.ElmId }, new AjaxOptions
+                                                                                   {
+                                                                                       HttpMethod = "GET",
+                                                                                       InsertionMode = InsertionMode.Replace,
+                                                                                       UpdateTargetId = ViewBag.ElmId
+                                                                                   })
+<br />
+Число сообщений:@Model.Count()
+<br />
+@if (@Model.Count() > 0)
+{
+    <table>
+        <tr>
+            <th>
+                Имя абонента
+            </th>
+            <th>
+                Телефон
+            </th>
+            <th>
+                Дата создания
+            </th>
+            <th>
+                Дата обновления
+            </th>
+            <th>
+                Статус
+            </th>
+        </tr>
+        
+    @foreach (var item in Model)
+    {    
+        <tr>
+            <td>
+                @item.Name_abonent
+            </td>
+            <td>
+                @item.Phone
+            </td>
+            <td align="center" nowrap="nowrap">
+                @item.Create_at
+            </td>
+            <td align="center" nowrap="nowrap">
+                @item.Update_at
+            </td>
+            <td>
+                @item.Status
+            </td>
+            @{/*<td>
+                @item.Message
+            </td>*/
+            }
+        </tr>
+    }
+
+    </table>
+}
+</td>

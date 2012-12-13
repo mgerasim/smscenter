@@ -1,0 +1,2 @@
+DELETE FROM user_action_link t WHERE t.id=8;
+INSERT INTO USER_ACTION_LINK(id, user_id, action_id) (SELECT s_user_action_link.nextval as id, 8 as USER_ID, ACTION_ID FROM USER_ACTION_LINK t WHERE t.user_id=9);

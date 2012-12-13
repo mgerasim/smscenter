@@ -1,0 +1,62 @@
+@@CR\base\core\i_run.sql CR\base\src\s_abonents.seq
+@@CR\base\core\i_run.sql CR\base\src\s_abonent_GROUP_LINK.seq
+@@CR\base\core\i_run.sql CR\base\src\s_actions.seq
+@@CR\base\core\i_run.sql CR\base\src\s_branches.seq
+@@CR\base\core\i_run.sql CR\base\src\s_error.seq
+@@CR\base\core\i_run.sql CR\base\src\s_groups.seq
+@@CR\base\core\i_run.sql CR\base\src\s_messages.seq
+@@CR\base\core\i_run.sql CR\base\src\s_role_action_link.seq
+@@CR\base\core\i_run.sql CR\base\src\s_status_msg.seq
+@@CR\base\core\i_run.sql CR\base\src\s_support.seq
+@@CR\base\core\i_run.sql CR\base\src\s_tasks.seq
+@@CR\base\core\i_run.sql CR\base\src\s_type_task.seq
+@@CR\base\core\i_run.sql CR\base\src\s_users.seq
+@@CR\base\core\i_run.sql CR\base\src\s_user_action_link.seq
+@@CR\base\core\i_run.sql CR\base\src\s_user_branche_link.seq
+@@CR\base\core\i_run.sql CR\base\src\s_user_roles.seq
+@@CR\base\core\i_run.sql CR\base\src\s_user_type_link.seq
+@@CR\base\core\i_run.sql CR\base\src\s_user_wishes.seq
+
+@@CR\base\core\i_run.sql CR\base\src\branches.tab
+@@CR\base\core\i_run.sql CR\base\src\user_roles.tab
+@@CR\base\core\i_run.sql CR\base\src\users.tab
+@@CR\base\core\i_run.sql CR\base\src\abonents.tab
+@@CR\base\core\i_run.sql CR\base\src\archive_message.tab
+@@CR\base\core\i_run.sql CR\base\src\errors.tab
+@@CR\base\core\i_run.sql CR\base\src\status_msg.tab
+@@CR\base\core\i_run.sql CR\base\src\support.tab
+@@CR\base\core\i_run.sql CR\base\src\groups.tab
+@@CR\base\core\i_run.sql CR\base\src\type_task.tab
+@@CR\base\core\i_run.sql CR\base\src\user_actions.tab
+@@CR\base\core\i_run.sql CR\base\src\user_action_link.tab
+@@CR\base\core\i_run.sql CR\base\src\user_branche_link.tab
+@@CR\base\core\i_run.sql CR\base\src\user_type_link.tab
+@@CR\base\core\i_run.sql CR\base\src\user_wishes.tab
+@@CR\base\core\i_run.sql CR\base\src\tasks.tab
+@@CR\base\core\i_run.sql CR\base\src\messages.tab
+@@CR\base\core\i_run.sql CR\base\src\abonent_group_link.tab
+@@CR\base\core\i_run.sql CR\base\src\role_action_link.tab
+
+@@CR\base\core\i_run.sql CR\base\src\vi_tasks.vw
+@@CR\base\core\i_run.sql CR\base\src\v_abonents.vw
+@@CR\base\core\i_run.sql CR\base\src\v_messages.vw
+@@CR\base\core\i_run.sql CR\base\src\v_roles.vw
+@@CR\base\core\i_run.sql CR\base\src\v_role_actions.vw
+@@CR\base\core\i_run.sql CR\base\src\v_users.vw
+@@CR\base\core\i_run.sql CR\base\src\v_user_actions.vw
+@@CR\base\core\i_run.sql CR\base\src\v_user_branches.vw
+@@CR\base\core\i_run.sql CR\base\src\v_user_types.vw
+@@CR\base\core\i_run.sql CR\base\src\v_user_wishes.vw
+
+@@CR\base\core\i_run.sql CR\base\src\pkg_error.spc
+@@CR\base\core\i_run.sql CR\base\src\pkg_error.bdy
+@@CR\base\core\i_run.sql CR\base\src\pkg_sms.spc
+@@CR\base\core\i_run.sql CR\base\src\pkg_sms.bdy
+@@CR\base\core\i_run.sql CR\base\src\pkg_gate.spc
+@@CR\base\core\i_run.sql CR\base\src\pkg_gate.bdy
+@@CR\base\core\i_run.sql CR\base\src\pkg_web.spc
+@@CR\base\core\i_run.sql CR\base\src\pkg_web.bdy
+
+@@CR\base\core\i_run.sql CR\base\src\data.sql
+
+exit

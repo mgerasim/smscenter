@@ -1,0 +1,107 @@
+﻿@{
+    /*
+ * Дата         Задание     Ответственный       Комментарий
+ * 2012-04-09   R0003       Герасимов           Создание предстваления для создания задания
+ * 2012-04-09   R0003       Герасимов           Поддержка выбора стпавочника
+ * 
+ */
+}
+
+@model SMScenterMVC.Models.StatMailing
+@{
+    ViewBag.Title = "MailingNew";
+}
+
+
+
+@{
+    List<SMScenterMVC.Models.TypeModel> list = ViewBag.Types;
+    var items = new SelectList(list, "ID", "Name");
+}
+
+ 
+
+
+<h2>@ViewBag.Error</h2>
+
+<h2>Новая задание</h2>
+@using (Html.BeginForm())
+{
+    <div>
+        <div class="editor-label">
+		    Наименование:
+		</div>
+		<div class="editor-field">
+            @Html.TextBoxFor(m => m.Name_task)
+		</div>
+
+        <div class="editor-label">
+		    Тип задания:
+		</div>
+		<div class="editor-field">
+			@Html.DropDownListFor(m => m.TypeID, @items)
+		</div>
+
+
+        <div class="editor-label">
+		    Сообщение:
+		</div>
+		<div class="editor-field">
+			@Html.TextAreaFor(m => m.Msg)
+		</div>
+
+        <div class="editor-label">
+		    Список телефонов через запятую (7XXX1112233;7YYY5554477):
+		</div>
+		<div class="editor-field">
+			@Html.TextAreaFor(m => m.SmsList)
+		</div>
+
+<table>
+    <tr>
+        <td>
+        </td>
+        <td>
+            Name
+        </td>
+    </tr>
+
+@foreach (var item in @ViewBag.Groups)
+{
+    <tr>
+        <th>
+            @Ajax.ActionLink("Выбрать", "Abonents", new { GroupID = item.ID }, new AjaxOptions
+                                                                                   {
+                                                                                       HttpMethod = "GET",
+                                                                                       InsertionMode = InsertionMode.Replace,
+                                                                                       UpdateTargetId = item.ID
+                                                                                   })
+        </th>
+        <th>
+            @item.Name
+        </th>
+    </tr>
+    <tr style="border-style: none; border-width: 0px; padding: 0px" >
+        <td id="@item.ID" colspan="2" style="border-style: none; border-width: 0px; padding: 0px">
+        </td>
+    </tr>
+}
+
+</table>
+ 
+
+
+        <p>
+			<input type="submit" value="Создать" />
+		</p>
+  
+
+        
+    </div>    
+ 
+     
+Html.EndForm();
+    
+    
+}
+

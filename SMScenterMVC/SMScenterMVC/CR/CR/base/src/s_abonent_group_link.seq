@@ -1,0 +1,7 @@
+create sequence S_ABONENT_GROUP_LINK
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 482
+increment by 1
+cache 20;
+

@@ -1,0 +1,10 @@
+create table SUPPORT
+(
+  ID      NUMBER(8) not null,
+  NAME    VARCHAR2(255) not null,
+  EMAIL   VARCHAR2(255) not null,
+  SMSMAIL VARCHAR2(255) not null,
+  PHONE   VARCHAR2(255) not null
+)
+;
+

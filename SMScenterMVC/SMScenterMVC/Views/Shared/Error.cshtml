@@ -1,0 +1,21 @@
+﻿@model System.Web.Mvc.HandleErrorInfo
+
+@{
+    ViewBag.Title = "Ошибка на странице";
+}
+
+<h2>
+    Ошибка.
+</h2>
+<table class="stat_param" width="100%">
+    <tr>
+        <td align="right">
+            <img alt="Внимание" src="@Url.Content("~/Content/themes/rtc_style/images/warning.png")" width="30px" height="30px" border="none" />
+        </td>
+        <td>
+            При отработке вашего запроса возникла ошибка!<br />
+            Если вы видите это сообщение, пожалуйста, оповестите об этом @Html.ActionLink("разработчиков", "About", "Home").
+        </td>
+    </tr>
+</table>
+

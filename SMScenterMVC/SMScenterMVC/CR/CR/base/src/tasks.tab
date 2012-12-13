@@ -1,0 +1,27 @@
+create table TASKS
+(
+  ID           NUMBER(38) not null,
+  NAME         VARCHAR2(255 CHAR),
+  CREATED_AT   DATE default sysdate,
+  UPDATED_AT   DATE,
+  TYPE_TASK_ID NUMBER,
+  USER_ID      NUMBER,
+  GROUP_MSG    NUMBER default 0 not null,
+  MESSAGE      VARCHAR2(1024),
+  BRANCHE_ID   NUMBER
+)
+;
+comment on column TASKS.GROUP_MSG
+  is '??????? ?? ???????? ?????????? ??? ????? ????? ?????????. 0 - ? messages, 1-? tasks';
+alter table TASKS
+  add primary key (ID);
+alter table TASKS
+  add constraint FK_TASKS_BRANCHE_ID foreign key (BRANCHE_ID)
+  references BRANCHES (ID);
+alter table TASKS
+  add constraint FK_TYPE_TASK foreign key (TYPE_TASK_ID)
+  references TYPE_TASK (ID);
+alter table TASKS
+  add constraint FK_USERS_TASKS foreign key (USER_ID)
+  references USERS (ID);
+

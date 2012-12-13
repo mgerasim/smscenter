@@ -1,0 +1,57 @@
+﻿@{
+    /*
+     * Дата         Задание     Ответственный       Комментарий
+     * 2012-04-12   R0001       Толшин              Добавление стандартного компонента "Календарь"
+     */
+    ViewBag.Title = "Список заданий";
+}
+
+<h2>Список заданий</h2>
+
+<p>
+    Для получения необходимого списка заданий выберите нужный диапазон времени и нажмите "Поиск".<br /><br />
+</p>
+@using (Ajax.BeginForm("ShowStat", "Mailings", new AjaxOptions
+                            {
+                                HttpMethod = "GET",
+                                InsertionMode = InsertionMode.Replace,
+                                UpdateTargetId = "searchResult",
+                                LoadingElementId = "progress"
+                            }))
+{
+    /*@Html.BeginForm()
+@Html.EditorForModel(SMScenterMVC.Models.StatParam)
+@Html.EndForm()*/
+
+    //@Html.DropDownList("tsk_type_name", (IEnumerable<SelectListItem>)ViewBag.States)    
+    //@model SMScenterMVC.Models.StatParam
+    //@Html.EditorFor(model => model.tsk_date_from)
+    //@Html.ValidationMessageFor(model => model.tsk_date_from)
+    
+    <table class="stat_param" width="100%">
+    <tr>
+        @{/*<td width="150px" align="right">с:
+            <input type="text" name="tsk_date_from" class="tcal" readonly="readonly" value="@Request.Cookies["c_tsk_dt_fr"].Value" style="width: 70px" />
+        <br />по:
+            <input type="text" name="tsk_date_to" class="tcal" readonly="readonly" value="@Request.Cookies["c_tsk_dt_to"].Value" style="width: 70px" />
+        </td>*/}
+        <td width="150px" align="right">с:
+            <input type="text" name="tsk_date_from" class="tcal" readonly="readonly" value="@ViewBag.DateFrom" style="width: 70px" />
+        <br />по:
+            <input type="text" name="tsk_date_to" class="tcal" readonly="readonly" value="@ViewBag.DateTo" style="width: 70px" />
+        </td>
+        <td width="65px" valign="bottom">
+            <input type="submit" value="Поиск" />            
+        </td>
+        <td valign="bottom">
+            <div id="progress">
+                <img src="@Url.Content("~/Content/themes/base/images/WorkInProgress.gif")" alt="loader" width="20px" height="20px" />
+            </div>
+        </td>
+    </tr>
+    </table>
+}
+
+<table id="searchResult" align="center" width="100%">
+
+</table>

@@ -1,0 +1,12 @@
+create table USER_ACTIONS
+(
+  ID          NUMBER not null,
+  NAME        VARCHAR2(100),
+  DESCRIPTION VARCHAR2(250)
+)
+;
+alter table USER_ACTIONS
+  add constraint PK_USER_ACTIONS primary key (ID);
+alter table USER_ACTIONS
+  add constraint UK_USER_ACTIONS_NAME unique (NAME);
+

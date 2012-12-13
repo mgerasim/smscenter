@@ -1,0 +1,48 @@
+﻿@{
+    /*
+ * Дата         Задание     Ответственный       Комментарий
+ * 2012-09-14   R0059       Герасимов           Создание предстваления для формы статистики
+ */
+}
+@model SMScenterMVC.Models.StatisticaModel
+
+@{
+    ViewBag.Title = "Статистика отправки сообщений";
+}
+
+<h2>Статистика отправки сообщений</h2>
+
+<div>
+	<table>
+		<tr>
+			<td></td>
+			<td>За день</td>
+			<td>Текущая неделя</td>
+			<td>Текущий месяц</td>
+		</tr>
+		<tr>
+			<td>Отправлено</td>
+			<td>@ViewBag.theStat.SendedDay</td>
+			<td>@ViewBag.theStat.SendedWeek</td>
+			<td>@ViewBag.theStat.SendedMonth</td>
+		</tr>
+		<tr>
+			<td>Не успешно</td>
+			<td>@ViewBag.theStat.FailedDay</td>
+			<td>@ViewBag.theStat.FailedWeek</td>
+			<td>@ViewBag.theStat.FailedMonth</td>
+		</tr>
+		
+		<tr>
+			<td>Всего</td>
+			<td>@ViewBag.TotalDay</td>
+			<td>@ViewBag.TotalWeek</td>
+			<td>@ViewBag.TotalMonth</td>
+		</tr>
+
+	</table>
+	<p>
+	В очереди: @ViewBag.QueueCount
+	</p>
+</div>
+

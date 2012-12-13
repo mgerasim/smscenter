@@ -1,0 +1,6 @@
+﻿@if (Request.IsAuthenticated)
+{
+    <div class="contact_us">
+        @Html.ActionLink("Написать пожелание", "ContactUs", "Home", null, new { @class = "openDialog", data_dialog_id = "emailDialog", data_dialog_title = "Написать пожелание", style = "text-decoration: none;color: #FFFFFF;font-weight: bold;", alt = "Написать пожелание администраторам", title = "Написать пожелание администраторам" })
+    </div>
+}

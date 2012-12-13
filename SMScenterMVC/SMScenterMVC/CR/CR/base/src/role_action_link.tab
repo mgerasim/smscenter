@@ -1,0 +1,16 @@
+create table ROLE_ACTION_LINK
+(
+  ID        NUMBER not null,
+  ROLE_ID   NUMBER,
+  ACTION_ID NUMBER
+)
+;
+alter table ROLE_ACTION_LINK
+  add constraint PK_ROLE_ACTIONS_LINK primary key (ID);
+alter table ROLE_ACTION_LINK
+  add constraint FK_ROLE_ACTIONS_LINK_ACTION_ID foreign key (ACTION_ID)
+  references USER_ACTIONS (ID);
+alter table ROLE_ACTION_LINK
+  add constraint FK_ROLE_ACTIONS_LINK_ROLE_ID foreign key (ROLE_ID)
+  references USER_ROLES (ID);
+

@@ -1,0 +1,1 @@
+INSERT INTO USER_ACTIONS(ID, NAME, DESCRIPTION) VALUES (S_ACTIONS.nextval, 'Abonents::BranchEdit', 'Edit branch of abonent');

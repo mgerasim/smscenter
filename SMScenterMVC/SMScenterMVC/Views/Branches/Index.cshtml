@@ -1,0 +1,53 @@
+﻿@{/*
+ * Дата         Задание     Ответственный       Комментарий 
+ * 2012-05-03   R0022       Герасимов           Удаление группы из справочника
+ */
+ }
+@model IEnumerable<SMScenterMVC.Models.BrancheModel>
+
+@{
+    ViewBag.Title = "Справочник филиалов";
+}
+
+<h2>Справочник филиалов</h2>
+
+<table class="stat_param" width="50%">
+    <tr>
+        <td align="right">
+            @Html.ActionLink("Создать филиал", "Create")
+        </td>
+    </tr>
+</table>
+<table width="50%">
+    <tr>
+        <th>#</th>
+        <th>
+            Полное название
+        </th>
+        <th>
+            Сокращенное называние
+        </th>
+        <th></th>
+    </tr>
+
+@{int i = 0;}
+@foreach (var item in Model)
+{
+    <tr>@{i += 1;
+        <td align="right">@i</td>}
+        <td>
+            @item.name_full
+        </td>
+        <td align="center">
+            @item.name_short
+        </td>        
+        <td align="center">
+            <a href="@Url.Action("Edit", new { id = item.ID })">
+                <img alt="Редактировать" title="Редактировать" src="@Url.Content("~/Content/themes/rtc_style/images/btn_edit_c.png")" width="20px" height="20px" border="none" />
+            </a>
+        </td>
+    </tr>
+}
+
+</table>
+

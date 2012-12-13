@@ -1,0 +1,63 @@
+﻿@model IEnumerable<SMScenterMVC.Models.ActionModel>
+
+@{
+    ViewBag.Title = "IndexActions";
+}
+
+<h2>Управление правами</h2>
+
+<div style="width: 50%">
+<div align="right">
+<div style="position: relative; top: 0px; right: 0px; bottom: 0px; left: 0px">
+    <div id="progress" style="position: absolute; top: 0px; right: 115px; bottom: 0px; left: 0px">
+        <img src="@Url.Content("~/Content/themes/base/images/WorkInProgress.gif")" alt="loader" width="20px" height="20px" />
+    </div>
+</div>
+<table class="stat_param">
+    <tr align="center">
+        <td width="100px">
+        @Ajax.ActionLink("Создать право", "CreateAction", new AjaxOptions
+                                                    {
+                                                        HttpMethod = "GET",
+                                                        InsertionMode = InsertionMode.Replace,
+                                                        UpdateTargetId = "divCrt",
+                                                        LoadingElementId = "progress"
+                                                    })
+        </td>
+    </tr>
+</table>
+</div>
+<div id="divCrt"></div>
+<div id="result" style="display:none;"></div>
+<table width="100%">
+    <tr>
+        <th>#</th>
+        <th>
+            Имя
+        </th>
+        <th>
+            Описание
+        </th>
+        <th></th>
+    </tr>
+@{ 
+int i = 0;
+foreach (var item in Model) {
+    i += 1;
+    <tr>
+        <td align="right">@i</td>
+        <td>
+            @item.Name
+        </td>
+        <td>
+            @item.Description
+        </td>
+        <td align="center" style="padding: 0px; margin: 0px">
+            @Html.ActionLink(" ", "DeleteAction", new { id = item.ID }, new { @class = "btn_img_del", alt = "Удалить", title = "Удалить", onclick = "return confirm('Вы действительно хотите удалить право?');" })
+        </td>
+    </tr>
+}
+}
+</table>
+</div>
+

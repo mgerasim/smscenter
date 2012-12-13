@@ -1,0 +1,32 @@
+﻿@{
+    /*
+ * Дата         Задание     Ответственный       Комментарий
+ * 2012-05-02   R0021       Герасимов           Справочник абонентов
+ * 2012-05-21   R0031       Герасимов           Замена Descriprion на Description
+ */
+}
+
+@model SMScenterMVC.Models.AbonentModel
+
+@{
+    ViewBag.Title = "Справочник абонентов";
+}
+
+<h2>Просмотр</h2>
+
+<fieldset>
+    <legend>Абонент</legend>
+
+    <div class="display-label">Имя:</div>
+    <div class="display-field">@Model.Name</div>
+
+    <div class="display-label">Должность:</div>
+    <div class="display-field">@Model.Description</div>
+
+    <div class="display-label">Телефон:</div>
+    <div class="display-field">@Model.Phone</div>
+    <p>
+        @Html.ActionLink("Редактировать", "Edit", new { id=Model.ID }) |
+        @Html.ActionLink("Назад в Список абонентов", "Index")
+    </p>
+</fieldset>

@@ -1,0 +1,77 @@
+﻿@model IEnumerable<SMScenterMVC.Models.GroupModel>
+
+@{
+    ViewBag.Title = "Справочник групп";
+}
+
+<h2>Управление группами рассылок</h2>
+@ViewBag.Error
+<table class="stat_param" width="100%">
+    <tr>
+    <td></td>
+        <td align="right">
+        @Ajax.ActionLink("Создать группу", "Create", new AjaxOptions
+                                                    {
+                                                        HttpMethod = "GET",
+                                                        InsertionMode = InsertionMode.Replace,
+                                                        UpdateTargetId = "divGrps",
+                                                        LoadingElementId = "progress"
+                                                    })
+        </td>
+    </tr>
+</table>
+<div class="groupframe">
+<table width="100%">
+@foreach (var item in Model)
+{
+    <tr>
+        <td>
+            @Ajax.ActionLink(item.Name, "Details", "Groups", new { GroupID = item.ID }, new AjaxOptions
+                                                                                   {
+                                                                                       HttpMethod = "GET",
+                                                                                       InsertionMode = InsertionMode.Replace,
+                                                                                       UpdateTargetId = "divGrps",
+                                                                                       LoadingElementId = "progress"
+                                                                                   })
+        </td>
+        <td align="center" style="padding: 0px; margin: 0px">
+            @{/*Ajax.ActionLink("Редактирование", "EditIndex", new { GroupID = item.ID }, new AjaxOptions
+                                                                                   {
+                                                                                       HttpMethod = "GET",
+                                                                                       InsertionMode = InsertionMode.Replace,
+                                                                                       UpdateTargetId = "divGrps",
+                                                                                       LoadingElementId = "progress"
+                                                                                   }) |
+            @Html.ActionLink("Удалить", "Delete", new { id=item.ID })*/
+            }
+            @Ajax.ActionLink(" ", "EditIndex", new { GroupID = item.ID }, new AjaxOptions
+                                                                                   {
+                                                                                       HttpMethod = "GET",
+                                                                                       InsertionMode = InsertionMode.Replace,
+                                                                                       UpdateTargetId = "divGrps",
+                                                                                       LoadingElementId = "progress"
+                                                                                   }, new { @class = "btn_img_edit", alt = "Редактировать", title = "Редактировать" })
+        </td>
+        <td align="center" style="padding: 0px; margin: 0px">
+            @{/*Html.ActionLink(" ", "Delete", new { id = item.ID }, new { @class = "btn_img_del", alt = "Удалить", title = "Удалить", onclick = "return confirm('Вы действительно хотите удалить группу?');" })*/}
+            <a href="@Url.Action("Delete", new { id = item.ID })" onclick = "return confirm('Вы действительно хотите удалить группу?');">
+                <img alt="Удалить" title="Удалить" src="@Url.Content("~/Content/themes/rtc_style/images/btn_del_c.png")" width="20px" height="20px" border="none" />
+            </a>
+        </td>
+    </tr>
+}
+
+</table>
+</div>
+<br />
+<div style="position: relative; top: 0px; right: 0px; bottom: 0px; left: 0px">
+    <div id="progress" style="position: absolute; top: 0px; right: 0px; bottom: 0px; left: 0px">
+        <img src="@Url.Content("~/Content/themes/base/images/WorkInProgress.gif")" alt="loader" width="20px" height="20px" />
+    </div>
+</div>
+<br />
+<br />
+<div id="divGrps"></div>
+<div id="result" style="display:none;"></div>
+
+

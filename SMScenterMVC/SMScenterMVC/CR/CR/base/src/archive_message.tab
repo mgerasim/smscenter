@@ -1,0 +1,26 @@
+create table ARCHIVE_MESSAGE
+(
+  ID              NUMBER(38) not null,
+  PHONE           VARCHAR2(255 CHAR),
+  CREATED_AT      DATE default sysdate,
+  UPDATED_AT      DATE,
+  TASK_ID         NUMBER(38) default 0 not null,
+  STATUS_ID       NUMBER default 1 not null,
+  MESSAGE         VARCHAR2(1024 CHAR),
+  USER_ID         NUMBER,
+  ERROR_ID        NUMBER,
+  SMPP_MESSAGE_ID VARCHAR2(255 CHAR),
+  PRIORITY        NUMBER(2) default 99
+)
+;
+comment on table ARCHIVE_MESSAGE
+  is 'Архив сообщений';
+comment on column ARCHIVE_MESSAGE.TASK_ID
+  is '0 - ??????? ?? ?????????';
+comment on column ARCHIVE_MESSAGE.STATUS_ID
+  is '1 - ?????? - ?????? ????????';
+comment on column ARCHIVE_MESSAGE.MESSAGE
+  is '????? ??? ?????????';
+alter table ARCHIVE_MESSAGE
+  add constraint PK_ARCHIVE_MESSAGES primary key (ID);
+

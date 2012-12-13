@@ -1,0 +1,53 @@
+﻿
+@model IEnumerable<SMScenterMVC.Models.SmsinfomsgModel>
+@{
+    ViewBag.Title = "Edit";
+}
+
+<table width="50%">
+    <tr>
+        <th>#</th>
+        <th>
+            Наименование
+        </th>
+        <th>
+            Текст
+        </th>
+		<th>
+            Предыдущий месяц
+        </th>
+		<th>
+            Текущий месяц
+        </th>
+    </tr>
+
+@{int i = 0;}
+@foreach (SMScenterMVC.Models.SmsinfomsgModel item in Model)
+{
+    <tr>@{i += 1;
+        <td align="right">@i</td>}
+        <td>
+            @item.Name
+        </td>
+        <td align="center">
+            @item.Text
+        </td>        
+             
+        <td align="center">
+			@item.StatMonthPrev() 
+        </td>
+
+		<td align="center">
+			@item.StatMonthCurr()
+        </td>
+    </tr>
+}
+
+</table>
+
+<div id="progress">
+						<img src="@Url.Content("~/Content/themes/base/images/WorkInProgress.gif")" alt="loader" width="20px" height="20px" />
+</div>
+
+
+

@@ -1,0 +1,91 @@
+﻿
+@model IEnumerable<SMScenterMVC.Models.StatMailing>
+@{
+    /*
+     * Дата         Задание     Ответственный       Комментарий
+     * 2012-09-07   R0057       Книжник             Добавление статуса для задания
+     */ }
+
+@if (@Model.Count() > 0)
+{
+<table id="statResault" width="100%">
+    <tr>
+        <th>
+            ID
+        </th>
+        <th width="190px">
+            Имя задания
+        </th>
+        <th>
+            Дата создания
+        </th>
+        <th>
+            Текст сообщения
+        </th>
+        <th>
+            Тип
+        </th>
+        <th>
+            Статус
+        </th>
+        <th width="190px">
+            Пользователь
+        </th>
+        <th>
+            Филиал
+        </th>
+    </tr>
+
+@foreach (var item in Model)
+{    
+    <tr>
+        <td nowrap="nowrap" align="center" valign="middle">
+            <div style="position: relative; top: 0px; right: 0px; bottom: 0px; left: -20px; text-align:left">
+                <div style="position: absolute; top: 0px; right: 0px; bottom: 0px; left: 0px">
+                    <img id="progress-@item.Id_task" style="display: none;" src="@Url.Content("~/Content/themes/base/images/WorkInProgress.gif")" alt="loader" width="10px" height="10px" />
+                </div>
+            </div>
+            @Ajax.ActionLink(item.Id_task, "Details", new { id = item.Id_task }, new AjaxOptions
+       {
+           HttpMethod = "GET",
+           InsertionMode = InsertionMode.Replace,
+           UpdateTargetId = item.Id_task,
+           LoadingElementId = "progress-" + item.Id_task
+       })
+        </td>
+        <td align="center" valign="middle">
+            @item.Name_task
+        </td>
+        <td align="center" nowrap="nowrap">
+            @item.Create_at
+        </td>
+        <td>
+            <!--<textarea rows="2" cols="50" class="txtarea_msg" readonly="readonly">-->
+            @item.Msg
+        </td>
+        <td>
+            @item.TypeName
+        </td>
+        <td>
+            @item.Status
+        </td>
+        <td>
+            @item.User.Name
+        </td>
+        <td align="center" valign="middle">
+            @item.Branche.name_short
+        </td>
+    </tr>
+    <tr style="border-style: none; border-width: 0px; padding: 0px" >
+        <td id="@item.Id_task" colspan="4" style="border-style: none; border-width: 0px; padding: 0px">
+        </td>
+    </tr>
+}
+</table>
+}
+else
+{
+<br />
+<div>Нет задач по данному запросу</div>
+<br />
+}

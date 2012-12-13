@@ -1,0 +1,24 @@
+﻿@model IEnumerable<SMScenterMVC.Models.AbonentModel>
+
+<td id="@ViewBag.ID" colspan="2" style="border-style: none; border-width: 0px; padding: 0px">
+<table>
+ @foreach (var item in Model)
+ {
+     <script type="text/javascript">
+         objSel = document.getElementById("SmsList");
+         objInp = document.getElementById("SmsList").value + ";" + @item.Phone;
+     </script>
+     <tr>
+        <td>
+            +
+        </td>
+        <td>
+            @item.Name
+        </td>
+        <td>
+            @item.Phone
+        </td>
+     </tr>
+ }
+</table>
+</td>

@@ -1,0 +1,1 @@
+UPDATE USERS SET LOGIN = replace(LOGIN, 'CORP\','')

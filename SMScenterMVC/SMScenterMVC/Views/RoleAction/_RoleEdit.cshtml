@@ -1,0 +1,85 @@
+﻿@model SMScenterMVC.Models.RoleModel
+
+<script src="@Url.Content("~/Scripts/jquery-1.4.4.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+
+@using (Html.BeginForm("EditRole","RoleAction"))
+{
+    @Html.ValidationSummary(true)
+    <fieldset>
+        <legend>Редактирование роли</legend>
+        <br />
+        <br />
+        @Html.HiddenFor(model => model.ID)
+        <input type="hidden" name="rl_act_del" id="rl_act_del" />
+        <input type="hidden" name="rl_act_add" id="rl_act_add" />
+        <table class="other_param">
+            <tr>
+                <th>@Html.LabelFor(model => model.Name):</th>
+                <td>@Html.EditorFor(model => model.Name)
+                    @Html.ValidationMessageFor(model => model.Name)</td>
+            </tr>
+            <tr>
+                <th>@Html.LabelFor(model => model.Description):</th>
+                <td>@Html.EditorFor(model => model.Description)
+                    @Html.ValidationMessageFor(model => model.Description)</td>
+            </tr>
+            <tr>
+                <th>Права роли:</th>
+                <td>        
+                    <table>
+                        <tr>
+                            <th>#</th>
+                            <th>
+                                Имя
+                            </th>
+                            <th>
+                                Описание
+                            </th>
+                        </tr>
+                     @{ 
+                         int i = 0;
+                         foreach (var item in ViewBag.AllActions)
+                         {
+                             i += 1;
+                        <tr>
+                            <td align="right">
+                                <input type="checkbox" id="@item.ID" onclick = "javascript: AddRemAction('@item.ID',this)" />
+                                @{foreach (var item2 in ViewBag.RoleActions)
+                                  {
+                                      if (item.ID == item2.ID)
+                                      {
+                                           <script type="text/javascript">
+                                            $(function () {
+                                                var chbx_elm = document.getElementById(@item.ID);
+                                                chbx_elm.checked = true;
+                                                chbx_elm.onclick();
+                                                var objInp = String(document.getElementById("rl_act_del").value);
+                                                objInp += "," + @item.ID;
+                                                $("#rl_act_del").val(objInp);
+                                            });                      
+                                           </script>
+                                      }
+                                  }
+                                }
+                            </td>
+                            <td>
+                                @item.Name
+                            </td>
+                            <td>
+                                @item.Description
+                            </td>
+                        </tr>
+                         }
+                    }
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <p>
+            <input type="submit" value="Сохранить" /> @Html.ActionLink("Отмена", "Index")
+        </p>
+    </fieldset>
+}
+

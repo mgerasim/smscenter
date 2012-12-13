@@ -1,0 +1,16 @@
+create table USER_TYPE_LINK
+(
+  ID      NUMBER not null,
+  USER_ID NUMBER,
+  TYPE_ID NUMBER
+)
+;
+alter table USER_TYPE_LINK
+  add constraint PK_USER_TYPE_LINK primary key (ID);
+alter table USER_TYPE_LINK
+  add constraint FK_USER_TYPE_LINK_TYPE_ID foreign key (TYPE_ID)
+  references TYPE_TASK (ID);
+alter table USER_TYPE_LINK
+  add constraint FK_USER_TYPE_LINK_USER_ID foreign key (USER_ID)
+  references USERS (ID);
+

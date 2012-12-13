@@ -1,0 +1,43 @@
+﻿@model IEnumerable<SMScenterMVC.Models.UserWishesModel>
+
+@{
+    ViewBag.Title = "Пожелания от пользователей";
+}
+
+<h2>Пожелания от пользователей</h2>
+
+<table>
+    <tr>
+         <th>
+            Сообщение
+        </th>
+        <th>
+            Пользователь
+        </th>
+        <th>
+            Дата
+        </th>
+        <th>
+            Филиал
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+      <tr>
+        <td>
+           @Html.ActionLink(item.Text, "Details", new { id = item.Id })
+        </td>
+        <td>
+            @item.User_Name
+        </td>
+        <td>
+            @item.Create_at
+        </td>
+        <td>
+            @item.Branche_Name
+        </td>
+    </tr>
+}
+
+</table>
+

@@ -1,0 +1,51 @@
+﻿@{
+    ViewBag.Title = "Список сообщений";
+}
+
+<h2>Список сообщений</h2>
+
+<p>
+    Для получения необходимого списка сообщений задайте необходимые параметры выборки и нажмите "Поиск".<br /><br />
+</p>
+@using (Ajax.BeginForm("ShowStatSingle", "Mailings", new AjaxOptions
+                            {
+                                HttpMethod = "POST",
+                                InsertionMode = InsertionMode.Replace,
+                                UpdateTargetId = "searchResult",
+                                LoadingElementId = "progress"
+                            }))
+{    
+    <table class="stat_param" width="100%">
+    <tr>
+        <td width="250px" align="right">Текст:
+            <input type="text" name="sms_text" value="@Html.ViewData["Text"]" style="width: 170px" />
+        <br />Телефон:
+            <input type="text" name="sms_phone" value="@Html.ViewData["Phone"]" style="width: 170px" />
+        </td>
+        <td width="150px" align="right">с:
+            <input type="text" name="sms_date_from" class="tcal" readonly="readonly" value="@Html.ViewData["DateFrom"]" style="width: 70px" />
+        <br />по:
+            <input type="text" name="sms_date_to" class="tcal" readonly="readonly" value="@Html.ViewData["DateTo"]" style="width: 70px" />
+        </td>
+        <td width="100px" align="right" valign="bottom">
+            Вывод:
+            <select name="pagesSize">
+                <option id="1" value="10" selected="selected">10</option>
+                <option id="2" value="20">20</option>
+                <option id="3" value="30">30</option>
+            </select>
+        </td>
+        <td width="65px" valign="bottom">
+            <input type="submit" onclick="javascript: $(function () { var objInp='0';$('#itemsCount').val(objInp); });" value="Поиск" />
+        </td>
+        <td valign="bottom">
+            <div id="progress">
+                <img src="@Url.Content("~/Content/themes/base/images/WorkInProgress.gif")" alt="loader" width="20px" height="20px" />
+            </div>
+        </td>
+    </tr>
+    </table>
+    <input type="hidden" name="itemsCount" id="itemsCount" value="@Html.ViewData["ItemsCount"]" />
+}
+
+<div id="searchResult"></div>

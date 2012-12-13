@@ -1,0 +1,15 @@
+create table ERRORS
+(
+  ID          NUMBER not null,
+  NAME        VARCHAR2(100),
+  DESCRIPTION VARCHAR2(250),
+  RESENDED    NUMBER default 0
+)
+;
+comment on table ERRORS
+  is '???? ?????? ??? ???????? ???';
+comment on column ERRORS.RESENDED
+  is 'Повторная попытка отправки сообщений';
+alter table ERRORS
+  add constraint PK_ERRORS primary key (ID);
+

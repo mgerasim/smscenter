@@ -1,0 +1,78 @@
+﻿@model IEnumerable<SMScenterMVC.Models.UserModel>
+
+@{
+    ViewBag.Title = "Список пользователей";
+}
+
+<h2>Список пользователей</h2>
+
+<table class="stat_param" width="65%">
+    <tr>
+        <td align="right">
+            @Html.ActionLink("Создать пользователя", "Create")
+        </td>
+    </tr>
+</table>
+<table width="65%">
+    <tr>
+        <th>#</th>
+        <th>
+            Имя
+        </th>
+@{/*        <th>
+            Дата создания
+        </th>
+        <th>
+            Дата изменения
+        </th>*/}
+        <th>
+            Логин
+        </th>
+        <th>
+            Роль
+        </th>
+        <th>
+            Филиал
+        </th>
+        <th colspan="2"></th>
+    </tr>
+@{int i = 0;}
+@foreach (var item in Model)
+{
+    <tr>@{i += 1;
+        <td align="right">@i</td>}
+        <td>
+            @item.Name
+        </td>
+       @{/* <td>
+            @String.Format("{0:dd.MM.yyyy}", item.Created_At)
+        </td>
+        <td>
+            @String.Format("{0:dd.MM.yyyy}", item.Update_At)
+        </td>*/}
+        <td>
+            @item.Login
+        </td>
+        <td>
+            @item.Role_name
+        </td>
+        <td>
+            @item.Branche_name
+        </td>
+        <td align="center">
+            @{/*Html.ActionLink(" ", "Edit", new { id = item.Id }, new { @class = "btn_img_edit", alt="Редактировать", title="Редактировать" })*/}
+            <a href="@Url.Action("Edit", new { id = item.Id })">
+                <img alt="Редактировать" title="Редактировать" src="@Url.Content("~/Content/themes/rtc_style/images/btn_edit_c.png")" width="20px" height="20px" border="none" />
+            </a>
+        </td>
+        <td align="center">
+            @{/*Html.ActionLink(" ", "Delete", new { id = item.Id }, new {@class = "btn_img_del", alt = "Удалить", title = "Удалить", onclick = "return confirm('Вы действительно хотите удалить пользователя?');" })*/}
+            <a href="@Url.Action("Delete", new { id = item.Id })" onclick = "return confirm('Вы действительно хотите удалить пользователя?');">
+                <img alt="Удалить" title="Удалить" src="@Url.Content("~/Content/themes/rtc_style/images/btn_del_c.png")" width="20px" height="20px" border="none" />
+            </a>
+        </td>
+    </tr>
+}
+
+</table>
+

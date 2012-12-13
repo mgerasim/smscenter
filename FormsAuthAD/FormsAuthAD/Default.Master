@@ -1,0 +1,92 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Default.master.cs" Inherits="FormsAuthAD.Default1" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>SMS-Центр</title>
+    <asp:ContentPlaceHolder ID="head" runat="server" />
+    <style type="text/css">
+        table.bt1 {            
+            border-collapse: collapse;
+            width: 750pt;
+            height: 100%;
+            border-spacing: 0px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            border-style: solid; 
+            border-width: 1px;
+            background-color: #FFFFFF
+        }
+        table.bt1 td, table.bt1 tr {            
+            border-collapse: collapse;
+            width: 100%;
+            height: 100%;
+            border-spacing: 0px;
+            margin: 0px; padding: 0px;
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; width: 100%; height: 100%;" 
+    bgcolor="Silver">
+    <table class="bt1" align="center">
+    <tr>
+    <td style="float: left; font-weight: bold; font-size: 32pt; background-color: #1E5C8A; height: 36pt; color: #FFFFFF;">
+    <!-- Header -->    
+    <div>
+        &nbsp;
+        SMS-Центр</div>
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <form id="form1" runat="server" style="font-family: verdana;">    
+        <asp:ContentPlaceHolder ID="cphSiteMenu" runat="server">
+        <div style="background-color: #1E5C8A">
+        <asp:Menu ID="menuSite" runat="server" Orientation="Horizontal" BorderStyle="None" 
+                DisappearAfter="0" Font-Bold="False" Font-Italic="False" Font-Names="Verdana" 
+                Font-Overline="False" Font-Size="10pt" Font-Strikeout="False" 
+                Font-Underline="False" ForeColor="White" EnableTheming="False" 
+                StaticEnableDefaultPopOutImage="False">
+            <DynamicHoverStyle BackColor="#64AADD" />
+            <DynamicMenuItemStyle BackColor="#1E5C8A" HorizontalPadding="10px" 
+                VerticalPadding="5px" />
+            <DynamicMenuStyle BackColor="#1E5C8A" />
+            <Items>
+                <asp:MenuItem Text="Главная" NavigateUrl="~/default.aspx"></asp:MenuItem>
+                <asp:MenuItem Text="Статистика" Selectable="False">
+                    <asp:MenuItem NavigateUrl="~/statGeneral.aspx" 
+                        Text="Полная статистика СМС-рассылки" 
+                        Value="Полная статистика СМС-рассылки">
+                    </asp:MenuItem>
+                    <asp:MenuItem Text="Создать элемент" 
+                        Value="Создать элемент"></asp:MenuItem>
+                </asp:MenuItem>
+                <asp:MenuItem Text="Помощь" Value="Помощь" NavigateUrl="~/Help.aspx"></asp:MenuItem>
+            </Items>
+            <LevelSelectedStyles>
+                <asp:MenuItemStyle Font-Underline="False" />
+            </LevelSelectedStyles>
+            <StaticHoverStyle BackColor="#64AADD" />
+            <StaticMenuItemStyle HorizontalPadding="10px" VerticalPadding="5px" 
+                BackColor="#1E5C8A" />
+            <StaticMenuStyle BackColor="#1E5C8A" />
+        </asp:Menu>
+        </div>
+        </asp:ContentPlaceHolder><br />
+    <div style="padding: 5px;">
+        <asp:ContentPlaceHolder ID="cphMain" runat="server" >
+        </asp:ContentPlaceHolder>
+    </div>
+    </form>
+    </td>
+    </tr>
+    <tr>
+    <td style="height: 50px; padding: 5px">
+    <!-- Footer -->    
+    &copy 2012
+    </td>
+    </tr>
+    </table>
+</body>
+</html>

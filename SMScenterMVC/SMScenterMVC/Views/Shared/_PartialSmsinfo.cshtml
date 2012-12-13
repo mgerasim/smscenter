@@ -1,0 +1,96 @@
+﻿
+   
+    
+@helper TreeView(List<SMScenterMVC.Models.SmsinfosprModel> theSprList)
+    {
+        foreach (var theSpr in theSprList)
+        {
+        <li>
+
+           <span>
+           @Ajax.ActionLink(theSpr.Name, "MsgIndex", new { id = theSpr.ID }, new AjaxOptions
+                                                                                   {
+                                                                                       HttpMethod = "GET",
+                                                                                       InsertionMode = InsertionMode.Replace,
+                                                                                       UpdateTargetId = "divSmsinfo",
+                                                                                       LoadingElementId = "progress"
+                                                                                   }) 
+
+		@Ajax.ActionLink("(ред)", "SmsinfosprEdit", new { id = theSpr.ID }, new AjaxOptions
+                                                                                   {
+                                                                                       HttpMethod = "GET",
+                                                                                       InsertionMode = InsertionMode.Replace,
+                                                                                       UpdateTargetId = "divSmsinfo",
+                                                                                       LoadingElementId = "progress"
+                                                                                   })
+
+
+		
+		@Html.ActionLink("(удл)", "SmsinfosprDelete", new { id = theSpr.ID }, 
+		new { onclick = "return confirm('Раздел будет удален?');" }) 
+		
+		
+		
+            
+            </span>
+             
+
+            @if (theSpr.FindAll("PARENT_ID=" + theSpr.ID.ToString()).Count >= 0)
+            {                
+                <ul>
+                    @TreeView(theSpr.FindAll("PARENT_ID=" + theSpr.ID.ToString()))
+                </ul>
+            }
+        </li>
+        }
+}
+
+
+@{
+    ViewBag.Title = "АРМ SMS";
+}
+
+@{
+    List<SMScenterMVC.Models.SmsinfosprModel> theSprList = new List<SMScenterMVC.Models.SmsinfosprModel>();
+    theSprList = (new SMScenterMVC.Models.SmsinfosprModel()).FindAll("PARENT_ID=0");
+    }
+
+@Ajax.ActionLink("Создать раздел", "SmsinfosprCreate", new AjaxOptions
+                                                    {
+                                                        HttpMethod = "GET",
+                                                        InsertionMode = InsertionMode.Replace,
+                                                        UpdateTargetId = "divSmsinfo",
+                                                        LoadingElementId = "progress"
+                                                    })
+<br /><br />
+@Ajax.ActionLink("Создать информацию", "SmsinfomsgCreate", new AjaxOptions
+                                                    {
+                                                        HttpMethod = "GET",
+                                                        InsertionMode = InsertionMode.Replace,
+                                                        UpdateTargetId = "divSmsinfo",
+                                                        LoadingElementId = "progress"
+                                                    })
+                                                    <br /><br />
+
+    <ul id="continentFolders">
+        @TreeView(theSprList)
+    </ul>
+
+    
+
+ <script type="text/javascript">
+     $(document).ready(function () {
+         $('#continentFolders').treeview({ collapsed: false });
+
+         $(".leaf.city").click(function () {
+             $.ajax({
+                 url: '/MVC3Extensions/Various/TreeView/GetCity',
+                 data: { cityId: $(this).attr("id") },
+                 type: 'GET',
+                 success: function (data) {
+                     alert("Selected city: " + data.Name + ", population: " + data.Population.toString());
+                 }
+             });
+         });
+     });
+    </script>

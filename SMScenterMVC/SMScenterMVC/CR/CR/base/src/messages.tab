@@ -1,0 +1,40 @@
+create table MESSAGES
+(
+  ID              NUMBER(38) not null,
+  PHONE           VARCHAR2(255 CHAR),
+  CREATED_AT      DATE default sysdate,
+  UPDATED_AT      DATE,
+  TASK_ID         NUMBER(38) default 0 not null,
+  STATUS_ID       NUMBER default 1 not null,
+  MESSAGE         VARCHAR2(1024 CHAR),
+  USER_ID         NUMBER,
+  ERROR_ID        NUMBER,
+  SMPP_MESSAGE_ID VARCHAR2(255 CHAR),
+  PRIORITY        NUMBER(2) default 10
+)
+;
+comment on column MESSAGES.TASK_ID
+  is '0 - ??????? ?? ?????????';
+comment on column MESSAGES.STATUS_ID
+  is '1 - ?????? - ?????? ????????';
+comment on column MESSAGES.MESSAGE
+  is '????? ??? ?????????';
+comment on column MESSAGES.SMPP_MESSAGE_ID
+  is 'Идентификатор сообщения по протоколу SMPP';
+comment on column MESSAGES.PRIORITY
+  is 'Приоритет сообщения';
+alter table MESSAGES
+  add primary key (ID);
+alter table MESSAGES
+  add constraint FK_ERRORS foreign key (ERROR_ID)
+  references ERRORS (ID);
+alter table MESSAGES
+  add constraint FK_STATUS_MSG foreign key (STATUS_ID)
+  references STATUS_MSG (ID);
+alter table MESSAGES
+  add constraint FK_TASKS_NOTES foreign key (TASK_ID)
+  references TASKS (ID);
+alter table MESSAGES
+  add constraint FK_USERS foreign key (USER_ID)
+  references USERS (ID);
+

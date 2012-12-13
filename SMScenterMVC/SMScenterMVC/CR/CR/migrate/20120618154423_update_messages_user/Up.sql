@@ -1,0 +1,1 @@
+UPDATE messages SET user_id=8 WHERE user_id=9;

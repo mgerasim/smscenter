@@ -1,0 +1,25 @@
+create table ABONENTS
+(
+  ID          NUMBER not null,
+  NAME        VARCHAR2(100 CHAR),
+  PHONE       VARCHAR2(11 CHAR),
+  DESCRIPTION VARCHAR2(100 CHAR),
+  BRANCHE_ID  NUMBER,
+  USER_ID     NUMBER,
+  DATE_CREATE DATE default sysdate,
+  DATE_MODIFY DATE
+)
+;
+comment on table ABONENTS
+  is 'Справочник телефонов';
+alter table ABONENTS
+  add constraint PK_ABONENTS primary key (ID);
+alter table ABONENTS
+  add constraint UK_ABONENTS unique (PHONE);
+alter table ABONENTS
+  add constraint FK_BRANCHES_ABONENTS foreign key (BRANCHE_ID)
+  references BRANCHES (ID);
+alter table ABONENTS
+  add constraint FK_USERS_ABONENTS foreign key (USER_ID)
+  references USERS (ID);
+

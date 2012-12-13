@@ -1,0 +1,20 @@
+create table GROUPS
+(
+  ID          NUMBER not null,
+  NAME        VARCHAR2(200 CHAR),
+  DESCRIPTION VARCHAR2(200 CHAR),
+  BRANCHE_ID  NUMBER,
+  USER_ID     NUMBER,
+  DATE_CREATE DATE default sysdate,
+  DATE_MODIFY DATE,
+  IS_DELETE   VARCHAR2(1 CHAR)
+)
+;
+comment on column GROUPS.IS_DELETE
+  is 'Признак того, что группа рассылки удалена, временное поле';
+alter table GROUPS
+  add constraint PK_GROUPS primary key (ID);
+alter table GROUPS
+  add constraint FK_USER_GROUPS foreign key (USER_ID)
+  references USERS (ID);
+

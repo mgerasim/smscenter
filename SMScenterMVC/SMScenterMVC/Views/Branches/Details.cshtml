@@ -1,0 +1,21 @@
+﻿@model SMScenterMVC.Models.BrancheModel
+
+@{
+    ViewBag.Title = "Просмотр";
+}
+
+<h2>Просмотр</h2>
+
+<fieldset>
+    <legend>Филиал</legend>
+
+    <div class="display-label">Сокращенное наименование</div>
+    <div class="display-field">@Model.name_short</div>
+
+    <div class="display-label">Полное наименование</div>
+    <div class="display-field">@Model.name_full</div>
+    <p>
+        @Html.ActionLink("Редактировать", "Edit", new { id=Model.ID }) |
+        @Html.ActionLink("Назад в Справочник филиалов", "Index")
+    </p>
+</fieldset>

@@ -1,0 +1,55 @@
+﻿@model IEnumerable<SMScenterMVC.Models.ActionModel>
+
+<fieldset>
+<legend>Просмотр роли</legend>
+<br />
+<br />
+<table class="other_param">
+    <tr>
+        <th>Название:</th><td>@ViewData["r_name"]</td>
+    </tr>
+    <tr>
+        <th>Описание:</th><td>@ViewData["r_description"]</td>
+    </tr>
+    <tr>
+        <th>Время изменения:</th><td>@ViewData["r_update_at"]</td>
+    </tr>
+    <tr>
+        <th>Пользователь:</th><td>@ViewData["r_updater"]</td>
+    </tr>
+    <tr>
+        <th>Права роли:</th>
+        <td>        
+            <table>
+                <tr>
+                    <th>#</th>
+                    <th>
+                        Имя
+                    </th>
+                    <th>
+                        Описание
+                    </th>
+                </tr>
+             @{ 
+                 int i = 0;
+                 foreach (var item in Model)
+                 {
+                     i += 1;
+                <tr>
+                    <td align="right">@i
+                    </td>
+                    <td>
+                        @item.Name
+                    </td>
+                    <td>
+                        @item.Description
+                    </td>
+                </tr>
+                 }
+            }
+            </table>
+        </td>
+    </tr>
+</table>
+</fieldset> 
+

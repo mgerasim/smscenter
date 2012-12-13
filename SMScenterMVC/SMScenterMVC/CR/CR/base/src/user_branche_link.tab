@@ -1,0 +1,19 @@
+create table USER_BRANCHE_LINK
+(
+  ID         NUMBER not null,
+  USER_ID    NUMBER,
+  BRANCHE_ID NUMBER
+)
+;
+comment on table USER_BRANCHE_LINK
+  is 'Привязка пользователей к филиалам';
+alter table USER_BRANCHE_LINK
+  add constraint PK_USER_BRANCHES primary key (ID)
+  disable;
+alter table USER_BRANCHE_LINK
+  add constraint FK_BRANCHES foreign key (BRANCHE_ID)
+  references BRANCHES (ID);
+alter table USER_BRANCHE_LINK
+  add constraint FK_USERS_2 foreign key (USER_ID)
+  references USERS (ID);
+

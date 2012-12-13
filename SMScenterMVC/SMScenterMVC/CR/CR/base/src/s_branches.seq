@@ -1,0 +1,8 @@
+create sequence S_BRANCHES
+minvalue 1
+maxvalue 99999999999
+start with 22
+increment by 1
+cache 20
+cycle;
+

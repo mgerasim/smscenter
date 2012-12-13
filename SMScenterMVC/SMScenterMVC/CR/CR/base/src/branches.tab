@@ -1,0 +1,12 @@
+create table BRANCHES
+(
+  ID     NUMBER not null,
+  S_NAME VARCHAR2(10 CHAR),
+  NAME   VARCHAR2(50 CHAR)
+)
+;
+comment on table BRANCHES
+  is 'Филиалы';
+alter table BRANCHES
+  add constraint PK_BRANCH primary key (ID);
+

@@ -1,0 +1,16 @@
+create table ABONENT_GROUP_LINK
+(
+  ID         NUMBER not null,
+  GROUP_ID   NUMBER,
+  ABONENT_ID NUMBER
+)
+;
+alter table ABONENT_GROUP_LINK
+  add constraint ID primary key (ID);
+alter table ABONENT_GROUP_LINK
+  add constraint FK_ABONENTS_AGL foreign key (ABONENT_ID)
+  references ABONENTS (ID);
+alter table ABONENT_GROUP_LINK
+  add constraint FK_GROUPS_AGL foreign key (GROUP_ID)
+  references GROUPS (ID);
+

@@ -1,0 +1,7 @@
+create sequence S_USER_BRANCHE_LINK
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 81
+increment by 1
+cache 20;
+

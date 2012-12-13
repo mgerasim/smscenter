@@ -1,0 +1,9 @@
+﻿<td id="td-@ViewBag.ElmId" colspan="2" style="border-style: none; border-width: 0px; padding: 0px">
+<script type="text/javascript">
+    $(function () {
+        //$("#SmsList").val("");
+        RemAllGroupPhones(@ViewBag.ElmId);
+        ChangeHref("Abonents?"+"GroupID="+@ViewBag.ElmId, "+", document.getElementById("href"+@ViewBag.ElmId));
+    });
+    </script>
+</td>

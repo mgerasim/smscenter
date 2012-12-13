@@ -1,0 +1,99 @@
+﻿@model IEnumerable<SMScenterMVC.Models.StatSingleMailing>
+@using SMScenterMVC.Helpers
+
+@if (Model.Count() > 0)
+{
+<table class="stat_param" width="100%">
+    <tr>
+        <td align="left" valign="middle" style="color: #C0C0C0;">
+            <div style="position: relative; top: 0px; right: 0px; bottom: 0px; left: 0px; vertical-align: middle;">
+                <div id="progress1">
+                    <img src="@Url.Content("~/Content/themes/base/images/WorkInProgress.gif")" alt="loader" width="20px" height="20px" />
+                </div>
+            </div>
+            <div style="margin-left: 30px; font-weight: bold">
+                @Ajax.PagingNavigator((string)Html.ViewData["DateFrom"], (string)Html.ViewData["DateTo"], (string)Html.ViewData["Phone"], (string)Html.ViewData["Text"], (int)Html.ViewData["PageNum"], (int)Html.ViewData["ItemsCount"], (int)Html.ViewData["PageSize"], "progress1")    
+            </div>
+        </td>
+        <td align="right">
+            Число записей:@Html.ViewData["ItemsCount"]
+        </td>
+    </tr>
+</table>    
+<table id="statResault" width="100%">
+    <tr>
+        <th>#</th>
+        <th>
+            Телефон
+        </th>
+        <th width="40%">
+            Сообщение
+        </th>
+        <th>
+            Тип
+        </th>
+        <th>
+            Статус
+        </th>
+        <th>
+            <font style="color: #808080">Создано</font><font style="color: #CC0000">Обновлено</font>
+        </th>
+        <th>
+            Пользователь
+        </th>
+        <th>
+            Филиал
+        </th>
+    </tr>
+
+@foreach (var item in Model)
+{    
+    <tr>
+        <td align="center">
+            @item.RNUM
+        </td>
+        <td>
+            @item.Phone
+        </td>
+        <td>
+            @item.Msg
+        </td>
+        <td>
+            @item.Type
+        </td>
+        <td>
+            @item.Status
+        </td>
+        <td nowrap="nowrap">
+            <font style="color: #808080">@item.Create_at</font><br /><font style="color: #CC0000">@item.Update_at</font>
+        </td>
+        <td align="center">
+            @item.Creater
+        </td>
+        <td align="center">
+            @item.Branche
+        </td>
+    </tr>
+}
+</table>
+<table class="stat_param" width="100%">
+    <tr>
+        <td align="left" valign="middle" style="color: #C0C0C0;">
+            <div style="position: relative; top: 0px; right: 0px; bottom: 0px; left: 0px; vertical-align: middle;">
+                <div id="progress2">
+                    <img src="@Url.Content("~/Content/themes/base/images/WorkInProgress.gif")" alt="loader" width="20px" height="20px" />
+                </div>
+            </div>
+            <div style="margin-left: 30px; font-weight: bold">
+                @Ajax.PagingNavigator((string)Html.ViewData["DateFrom"], (string)Html.ViewData["DateTo"], (string)Html.ViewData["Phone"], (string)Html.ViewData["Text"], (int)Html.ViewData["PageNum"], (int)Html.ViewData["ItemsCount"], (int)Html.ViewData["PageSize"], "progress2")    
+            </div>
+        </td>
+    </tr>
+</table>
+}
+else
+{
+<br />
+<div>Нет задач по данному запросу</div>
+<br />
+}

@@ -1,0 +1,2 @@
+C:\Oracle\product\11.2.0.3\ODP.NET\bin\2.x\OraProvCfg.exe /action:config  /product:aspnet  /component:all             /frameworkversion:v2.0.50727             /providerpath:c:\Oracle\odp.net\bin\2.x\Oracle.Web.dll
+pause

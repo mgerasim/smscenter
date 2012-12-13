@@ -1,0 +1,13 @@
+﻿@model SMScenterMVC.Models.ContactUsInput
+
+
+@using (Ajax.BeginForm(new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "emailDialog" }))
+{
+    @Html.ValidationSummary(true)
+  
+    @Html.EditorForModel()
+
+    <p>
+        <input type="submit" value="Отправить!" />
+    </p>
+}

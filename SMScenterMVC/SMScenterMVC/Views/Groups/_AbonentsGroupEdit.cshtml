@@ -1,0 +1,160 @@
+﻿@{
+    /*
+ * Дата         Задание     Ответственный       Комментарий
+ * 2012-11-28   R0066       Михаил Герасимов    Возможность редактировать филиал для группы
+ */
+}
+
+@model SMScenterMVC.Models.GroupModel
+
+<script src="@Url.Content("~/Scripts/jquery-1.4.4.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+
+@using (Html.BeginForm("Edit", "Groups"))
+{
+    @Html.ValidationSummary(true)
+    <fieldset>
+        <legend>Редактирование группы</legend>
+        <br />
+        <br />
+        @Html.HiddenFor(model => model.ID)
+        <input type="hidden" name="gr_abon_del" id="gr_abon_del" />
+        <input type="hidden" name="gr_abon_add" id="gr_abon_add" />
+        <table class="other_param">
+            <tr>
+                <th>@Html.LabelFor(model => model.Name):</th>
+                <td>@Html.EditorFor(model => model.Name)
+                    @Html.ValidationMessageFor(model => model.Name)</td>
+            </tr>
+			@if (SMScenterMVC.Utils.AccessActions.IsAccess("Groups::BranchEdit"))
+			{
+				<tr>
+					<th>@Html.LabelFor(model => model.BranchID):</th>
+					<td>
+						@Html.DropDownListFor(model => model.BranchID, new SelectList(ViewBag.AllBranches, "ID", "name_full"))
+						@Html.ValidationMessageFor(model => model.BranchID)
+					</td>
+				</tr>
+			}
+            <tr>
+                <th>Абоненты группы:</th>
+                <td>        
+                    <table>
+                        <tr>
+                            <th>#</th>
+                            <th>
+                                Имя
+                            </th>
+                            <th>
+                                Телефон
+                            </th>
+                            <th>
+                                Информация
+                            </th>
+                        </tr>
+                     @{ 
+                         int i = 0;
+                         foreach (var item in ViewBag.AllAbonents)
+                         {
+                             i += 1;
+                        <tr>
+                            <td align="right">
+                                <input type="checkbox" id="abon-@item.ID" onclick = "javascript: AddRemStr('@item.ID',this,'gr_abon_add')" />
+                                @{foreach (var item2 in ViewBag.GroupAbonents)
+                                  {
+                                      if (item.ID == item2.ID)
+                                      {
+                                           <script type="text/javascript">
+                                            $(function () {
+                                                var chbx_elm = document.getElementById("abon-"+@item.ID);
+                                                chbx_elm.checked = true;
+                                                chbx_elm.onclick();
+                                                var objInp = String(document.getElementById("gr_abon_del").value);
+                                                objInp += ",|" + @item.ID + "|";
+                                                $("#gr_abon_del").val(objInp);
+                                            });                      
+                                           </script>
+                                      }
+                                  }
+                                }
+                            </td>
+                            <td>
+                                @item.Name
+                            </td>
+                            <td>
+                                @item.Phone
+                            </td>
+                            <td>
+                                @item.Description
+                            </td>
+                        </tr>
+                         }
+                    }
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <p>
+            <input type="submit" value="Сохранить" /> @Html.ActionLink("Отмена", "Index")
+        </p>
+
+@{/*
+<table class="stat_param">
+
+    <tr>
+        <td>
+        <b>Абоненты группы: </b><br />
+        <input type="hidden" name="gr_abonents" id="gr_abonents" />
+        </td>
+    </tr>
+</table>
+<table width="100%">
+    <tr>
+        <th width="20">#</th>
+        <th width="250">Имя</th>
+        <th width="100">Телефон</th>
+        <th>Информация</th>
+    </tr>
+<!--<div class="groupframe">-->
+@foreach (var item in Model)
+{
+    <tr>
+        <td width="20">
+            <input type="checkbox" id="@item.ID" onclick = "javascript: AddRemAbonent('@item.ID',this,@ViewBag.ID)" />
+            @{foreach (var item2 in ViewBag.Abonent_group)
+              {
+                  if (item.ID == item2.ID)
+                  {
+                       <script type="text/javascript">
+                        $(function () {
+                            var chbx_elm = document.getElementById(@item.ID);
+                            chbx_elm.checked = true;
+                            chbx_elm.onclick();
+                        });                      
+                       </script>
+                  }
+              }
+            }
+        </td>
+        <td width="250">
+            @item.Name
+        </td>
+        <td width="100">
+            @item.Phone
+        </td>
+        <td>
+            @item.Description
+        </td>
+    </tr>
+}
+</table>
+<!--</div>
+</td>
+</tr>
+</table>-->
+<br />
+<input type="submit" value="Сохранить" />
+    @Html.ActionLink("Отменить", "Index")*/}
+</fieldset>
+}

@@ -1,0 +1,10 @@
+﻿@model IEnumerable<string>
+
+@if (Model.Count() > 1)
+{
+    foreach (string str in Model)
+    {
+       @MvcHtmlString.Create(str)
+       @:&nbsp;
+    }
+}

@@ -1,0 +1,1 @@
+alter table ARCHIVE_MESSAGE add STARTED timestamp;

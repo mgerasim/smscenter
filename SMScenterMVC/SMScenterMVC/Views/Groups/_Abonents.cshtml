@@ -1,0 +1,46 @@
+﻿@model IEnumerable<SMScenterMVC.Models.AbonentModel>
+
+<fieldset>
+<legend>Просмотр группы</legend>
+<br />
+<br />
+<table class="other_param">
+    <tr>
+        <th>Название группы:</th><td>@ViewBag.NameGr</td>
+    </tr>
+    <tr>
+        <th>Абоненты группы:</th>
+        <td>
+            <table>
+                <tr>
+                    <th>#</th>
+                    <th>
+                        Имя
+                    </th>
+                    <th>
+                        Телефон
+                    </th>
+                </tr>
+             @{ 
+                int i = 0;   
+                foreach (var item in Model)
+                {
+                    i += 1;
+                <tr>
+                    <td align="right">@i
+                    </td>
+                    <td>
+                        @item.Name
+                    </td>
+                    <td>
+                        @item.Phone
+                    </td>
+                </tr>
+                }
+            }
+            </table>
+        </td>
+    </tr>
+</table>
+</fieldset> 
+

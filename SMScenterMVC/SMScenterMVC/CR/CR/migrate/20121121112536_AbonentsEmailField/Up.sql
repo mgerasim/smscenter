@@ -1,0 +1,1 @@
+alter table ABONENTS add EMAIL varchar2(100);

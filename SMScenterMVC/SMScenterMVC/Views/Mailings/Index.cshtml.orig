@@ -1,0 +1,60 @@
+﻿@{
+    /*
+     * Дата         Задание     Ответственный       Комментарий
+     * 2012-04-12   R0001       Толшин              Добавление стандартного компонента "Календарь"
+     */
+    ViewBag.Title = "Список рассылок";
+}
+
+<h2>Список рассылок</h2>
+
+<br />
+
+
+@using (Ajax.BeginForm("ShowStat", "Mailings", new AjaxOptions { 
+                                            HttpMethod = "GET", 
+                                            InsertionMode = InsertionMode.Replace, 
+                                            UpdateTargetId = "searchResult",
+                                            LoadingElementId = "progress"                                            
+}))
+{
+    /*@Html.BeginForm()
+@Html.EditorForModel(SMScenterMVC.Models.StatParam)
+@Html.EndForm()*/
+
+    //@Html.DropDownList("tsk_type_name", (IEnumerable<SelectListItem>)ViewBag.States)    
+    //@model SMScenterMVC.Models.StatParam
+    //@Html.EditorFor(model => model.tsk_date_from)
+    //@Html.ValidationMessageFor(model => model.tsk_date_from)
+    <table class="stat_param" width="100%">
+    <tr>
+        <!--<td>Тип задачи:<br />
+            <input type="text" name="tsk_type" />
+        </td>
+        <td>Пользователь:<br />
+            <input type="text" name="tsk_user_id" />
+        </td>-->
+        <td width="150px" align="right">с:
+            <input type="text" name="tsk_date_from" class="tcal" readonly="readonly" value="@HttpContext.Current.Request.Cookies["c_tsk_dt_fr"].Value" style="width: 70px" />
+        <br /><!--</td>
+        <td width="150px" align="right">-->по:
+            <input type="text" name="tsk_date_to" class="tcal" readonly="readonly" value="@HttpContext.Current.Request.Cookies["c_tsk_dt_to"].Value" style="width: 70px" />
+        </td>
+        <td width="65px" valign="bottom">
+            <input type="submit" value="Поиск" />            
+        </td>
+        <td valign="bottom">
+            <div id="progress">
+                <img src="@Url.Content("~/Content/themes/base/images/WorkInProgress.gif")" alt="loader" width="20px" height="20px" />
+            </div>
+        </td>
+        <td align="right" valign="bottom">
+            @Html.ActionLink("Новое задание", "MailingNew", "Mailings")
+        </td>
+    </tr>
+    </table>
+}
+
+<table id="searchResult" align="center" width="100%">
+
+</table>

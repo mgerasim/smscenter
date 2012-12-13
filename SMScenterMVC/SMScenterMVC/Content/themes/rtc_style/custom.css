@@ -1,0 +1,82 @@
+
+body { 
+    background-color: #fff;
+    background:url(/bg-main-decor.png) no-repeat center top #FFF;
+}
+
+.container {
+#    background-color: #fff;
+	  
+}
+
+.otstup {
+    height: 75px;
+    
+}
+
+#header {
+    background: url(/images/body-bot.jpg) 0 -10px repeat-x;
+    background-size: 100%;
+	padding:1em 0 1.5em 0; 
+	
+}
+
+#main { 
+#    border-right:2px solid #222;
+#	border-bottom:2px solid #222; 
+	  margin:0 auto; 
+#	    width:958px; 
+	    width:963px;
+	    padding:0 10px;
+		background:url(/bg-main.png) repeat-y center top;
+		    position:relative;
+			margin:0 auto;
+			    z-index:1;
+			
+	    }
+	    
+	    #main_content { 
+#		background:#fff; 
+#		    border:2px solid #ccc; 
+		    
+		
+		      }
+		      
+		      
+.alt {
+    color: #666;
+    font-family: "Warnock Pro", "Goudy Old Style","Palatino","Book Antiqua", Georgia, serif;
+    font-style: italic;
+    font-weight: normal;
+}
+
+p.incr, .incr p {
+    font-size: 15px;
+    line-height: 1.44em;  
+    margin-bottom: 1.5em;
+}
+
+#navmain a:link { color: #F60; }
+#navmain a:visited { color: #900; }
+#navmain a:hover { color: #F33; }
+#navmain a:active {color: #B2F511; }
+
+/* Logon button */
+a.logon_button {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    text-align: center;
+    width: 190px;
+    color: #fff;
+    background: #006400;
+    font-size: 150%;
+    font-weight: bold;
+    padding: 20px;
+}
+
+.round {
+    -moz-border-radius:		10px;
+    -webkit-border-radius:	10px;
+    border-radius:		10px;
+}

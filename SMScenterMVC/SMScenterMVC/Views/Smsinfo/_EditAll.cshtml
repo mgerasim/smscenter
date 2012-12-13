@@ -1,0 +1,74 @@
+﻿@model IEnumerable<SMScenterMVC.Models.SmsinfomsgModel>
+@{
+    ViewBag.Title = "Edit";
+}
+
+
+<table class="stat_param" width="50%">
+    <tr>
+        <td align="right">
+         @Ajax.ActionLink("Создать информацию", "SmsinfomsgCreate", new AjaxOptions
+                                                    {
+                                                        HttpMethod = "GET",
+                                                        InsertionMode = InsertionMode.Replace,
+                                                        UpdateTargetId = "divSmsinfo",
+                                                        LoadingElementId = "progress"
+                                                    })
+            
+        </td>
+    </tr>
+</table>
+<table width="50%">
+    <tr>
+        <th>#</th>
+        <th>
+            Наименование
+        </th>
+        <th>
+            Текст
+        </th>
+        <th></th>
+		<th></th>
+    </tr>
+
+@{int i = 0;}
+@foreach (var item in Model)
+{
+    <tr>@{i += 1;
+        <td align="right">@i</td>}
+        <td>
+            @item.Name
+        </td>
+        <td align="center">
+            @item.Text
+        </td>        
+             
+        <td align="center">
+
+        
+            @Ajax.ActionLink(" ", "SmsinfomsgEdit", new { id = item.ID }, new AjaxOptions
+                                                                                   {
+                                                                                       HttpMethod = "GET",
+                                                                                       InsertionMode = InsertionMode.Replace,
+                                                                                       UpdateTargetId = "divSmsinfo",
+                                                                                       LoadingElementId = "progress"
+                                                                                   }, 
+                                                                                   new { @class = "btn_img_edit", alt = "Редактировать", title = "Редактировать" })
+
+            
+        </td>
+
+		<td align="center">
+            <a href="@Url.Action("SmsinfomsgDelete", new { id = item.ID })" onclick = "return confirm('Раздел будет удален из всех групп, в которых состоит!\nВы действительно хотите удалить данный раздел?');">
+                <img alt="Удалить" title="Удалить" src="@Url.Content("~/Content/themes/rtc_style/images/btn_del_c.png")" width="20px" height="20px" border="none" />
+            </a>            
+        </td>
+
+
+
+    </tr>
+}
+
+</table>
+
+

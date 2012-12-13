@@ -1,0 +1,123 @@
+﻿@{
+        /*
+ * Дата         Задание     Ответственный       Комментарий
+ * 2012-04-17   R0012       Герасимов           Роли 
+ * 2012-04-20   R0016       Герасимов           Сохранение роли пользователя в куки
+ * 2012-05-03   R0021       Герасимов           Вывод ошибочных сообщений через ViewBag.Error
+ * 2012-06-21   R0048       Герасимов           Выбор времени на форме Новое задание из раскрывающего списка
+ * 2012-06-22   R0050       Герасимов           АРМ SMS для ЦОО
+ */
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewBag.Title</title>
+    <link rel="shortcut icon" href="@Url.Content("~/Content/themes/rtc_style/images/favicon.ico")" />
+    <link href="@Url.Content("~/Content/themes/base/jquery-ui.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/sms_theme.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/tcal.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/jquerycssmenu.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/Smsinfo.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/jquery_treeview.css")" rel="stylesheet" type="text/css" />
+  
+    @Content.Script("jquery-1.4.4.min.js", Url)
+    @Content.Script("jquery.unobtrusive-ajax.min.js", Url)
+    @Content.Script("tcal.js", Url)
+    @Content.Script("_mailings.js", Url)
+    @Content.Script("jquerycssmenu.js", Url)
+    @Content.Script("jquery.validate.min.js", Url)
+    @Content.Script("jquery.validate.unobtrusive.min.js", Url)
+    @Content.Script("jquery-ui.js", Url)
+    @Content.Script("jquery.treeview.js", Url)
+	@Content.Script("celebtree.js", Url)
+
+    <script type="text/javascript">
+
+        $.ajaxSetup({ cache: false });
+
+        $(document).ready(function () {
+            $(".openDialog").live("click", function (e) {
+                e.preventDefault();
+
+                $("<div></div>")
+                    .addClass("dialog")
+                    .attr("id", $(this)
+                    .attr("data-dialog-id"))
+                    .appendTo("body")
+                    .dialog({
+                        title: $(this).attr("data-dialog-title"),
+                        close: function () { $(this).remove() },
+                        modal: true
+                    })
+                    .load(this.href);
+            });
+
+            $(".close").live("click", function (e) {
+                e.preventDefault();
+                $(this).closest(".dialog").dialog("close");
+            });
+        });
+    </script>
+
+
+<!--[if lte IE 7]>
+<style type="text/css">
+html .jquerycssmenu{height: 1%;} /*Holly Hack for IE7 and below*/
+</style>
+<![endif]-->
+
+    @{/*<link href="../../Content/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />
+    <link href="../../Content/sms_theme.css" rel="stylesheet" type="text/css" />
+    <script src="../../Scripts/jquery-1.4.4.min.js" type="text/javascript"></script>
+    <script src="../../Scripts/jquery.unobtrusive-ajax.min.js" type="text/javascript"></script>
+    @{/*<link href="@Url.Content("~/Content/Site.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/sms_theme.css")" rel="stylesheet" type="text/css" />
+    @Content.Script("jquery-1.4.4.min.js", Url)
+    @Content.Script("jquery.unobtrusive-ajax.min.js", Url)
+    @RenderSection("scripts",false)
+    <link href="../../Content/tcal.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="../../Scripts/tcal.js"></script> 
+    <script src="../../Scripts/_mailings.js" type="text/javascript"></script>*/}
+</head>
+
+
+<body>
+    
+
+        @Html.Partial("_ContactUsModal")
+        <div class="page">
+        <div id="pre_main">
+            <div id="header">
+                <div id="title">
+                    <div class="div_h1">SMS-Центр </div>
+                    <div class="div_h6">Версия 1.0</div>
+                </div>
+                 <br />
+                 @Html.Partial("_LogOnPartial")
+            </div>
+            <div id="main">
+                <h3>@ViewBag.Error</h3>
+
+                
+                        
+                @RenderBody()
+                        
+                
+            </div>
+                <div id="footer" class="clear">
+                Группа Cпециализированных программных систем<br />Хабаровский филиал ОАО "Ростелеком"<br />2012
+                </div>            
+        </div>    
+        <div id="post_footer">
+        </div>
+        </div>
+    
+    @{/*
+    @Content.Script("jquery-1.4.4.min.js", Url)
+    @Content.Script("jquery.unobtrusive-ajax.min.js", Url)    
+    @RenderSection("scripts",false)
+    */
+    }
+</body>
+
+</html>

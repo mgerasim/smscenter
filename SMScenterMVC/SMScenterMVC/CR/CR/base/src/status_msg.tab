@@ -1,0 +1,9 @@
+create table STATUS_MSG
+(
+  ID   NUMBER not null,
+  NAME VARCHAR2(100)
+)
+;
+alter table STATUS_MSG
+  add constraint PK_STATUS_SMS primary key (ID);
+

@@ -1,0 +1,66 @@
+﻿@model IEnumerable<SMScenterMVC.Models.RoleModel>
+
+@{
+    ViewBag.Title = "Справочник ролей";
+}
+
+<h2>Управление ролями</h2>
+@ViewBag.Error
+<div style="width: 50%">
+<div align="right">
+<table class="stat_param">
+    <tr align="center">
+        <td width="100px">
+        @Ajax.ActionLink("Создать роль", "CreateRole", new AjaxOptions
+                                                    {
+                                                        HttpMethod = "GET",
+                                                        InsertionMode = InsertionMode.Replace,
+                                                        UpdateTargetId = "divGrps",
+                                                        LoadingElementId = "progress"
+                                                    })
+        </td>
+    </tr>
+</table>
+</div>
+<div class="groupframe">
+<table width="100%">
+@foreach (var item in Model)
+{
+    <tr>
+        <td>
+            @Ajax.ActionLink(item.Name, "Details", new { RoleID = item.ID }, new AjaxOptions
+                                                                                   {
+                                                                                       HttpMethod = "GET",
+                                                                                       InsertionMode = InsertionMode.Replace,
+                                                                                       UpdateTargetId = "divGrps",
+                                                                                       LoadingElementId = "progress"
+                                                                                   })
+        </td>
+        <td align="center" style="padding: 0px; margin: 0px">
+            @Ajax.ActionLink(" ", "EditRoleIndex", new { RoleID = item.ID }, new AjaxOptions
+                                                                                   {
+                                                                                       HttpMethod = "GET",
+                                                                                       InsertionMode = InsertionMode.Replace,
+                                                                                       UpdateTargetId = "divGrps",
+                                                                                       LoadingElementId = "progress"
+                                                                                   }, new { @class = "btn_img_edit", alt="Редактировать", title="Редактировать" })
+        </td>
+        <td align="center" style="padding: 0px; margin: 0px">
+            @Html.ActionLink(" ", "DeleteRole", new { id = item.ID }, new { @class = "btn_img_del", alt = "Удалить", title = "Удалить", onclick = "return confirm('Вы действительно хотите удалить роль?');" })
+        </td>
+    </tr>
+}
+
+</table>
+</div>
+</div>
+<br />
+<div style="position: relative; top: 0px; right: 0px; bottom: 0px; left: 0px">
+    <div id="progress" style="position: absolute; top: 0px; right: 0px; bottom: 0px; left: 0px">
+        <img src="@Url.Content("~/Content/themes/base/images/WorkInProgress.gif")" alt="loader" width="20px" height="20px" />
+    </div>
+</div>
+<br />
+<br />
+<div id="divGrps"></div>
+<div id="result" style="display:none;"></div>

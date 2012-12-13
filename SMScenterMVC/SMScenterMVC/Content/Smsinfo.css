@@ -1,0 +1,85 @@
+﻿
+
+#parttop
+{
+    width: 100%;
+    height: 15em;
+    border: 2px;
+}
+
+#smsnumber
+{
+    width: 20%;
+    float: left;
+}
+
+#smstext
+{
+    width: 20%;
+    float: left;
+}
+
+#partbottom
+{
+    width: 100%;
+    border: 2px;
+}
+
+.tr_top
+{
+    valign: top;
+}
+
+#smsinfo_sidebar
+{
+    width:220px;
+	height:100%;
+	float:left;
+}
+
+#smsinfo_body
+{
+    width:220px;
+	height:100%;
+	float:right;
+	background-color:#60ee60;
+}
+
+
+
+.first 
+{
+    margin-left:0;
+    padding-left:0;
+    }
+.last {margin-right:0;padding-right:0;}
+
+.clear
+{
+    clear: both;
+}
+
+
+.header_part
+{
+    position: relative;
+    margin-bottom: 0px;
+    color: #000;
+    padding: 0;
+}
+
+
+
+.footer_part
+{
+    border-color: #00BEF2;
+    color: #999;
+    padding: 10px 0px 0px 0px;
+    text-align: right;
+    line-height: normal;
+    margin: 0px 7px 0px 7px;
+    font-size: .9em;
+    border-top-style: solid;
+    border-top-width: 1px;
+}
+

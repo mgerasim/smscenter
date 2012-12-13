@@ -1,0 +1,1 @@
+UPDATE USERS SET login='smsuser' WHERE ID=3

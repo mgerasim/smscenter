@@ -1,0 +1,41 @@
+﻿@model IEnumerable<SMScenterMVC.Models.AbonentModel>
+<td id="td-@ViewBag.ID" colspan="2" style="border-style: none; border-width: 0px; padding: 0px">
+
+@if (@Model.Count() > 0)
+{
+<table>
+ @foreach (var item in Model)
+ {
+     <tr>
+        <td>
+            <input type="checkbox" id="@ViewBag.ID-@item.ID" onclick = "javascript: AddRemPhone('@item.Phone',this,@ViewBag.ID)" />
+            <script type="text/javascript">
+                $(function () {
+                    var chbx_elm = document.getElementById(@ViewBag.ID+"-"+@item.ID);
+                    chbx_elm.checked = true;
+                    chbx_elm.onclick();
+                });
+            </script>
+        </td>
+        <td>
+            @item.Name
+        </td>
+        <td>
+            @item.Phone
+        </td>
+     </tr>
+ }
+</table>    
+}
+else
+{ 
+    <br />
+    <div>Группа пуста</div>
+    <br />
+}
+    <script type="text/javascript">
+        $(function () {
+            ChangeHref("Abonents_empty?"+"GroupID="+@ViewBag.ID, "-&nbsp", document.getElementById("href"+@ViewBag.ID));
+        });
+    </script>
+</td>

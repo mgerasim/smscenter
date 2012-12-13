@@ -1,0 +1,53 @@
+﻿@model SMScenterMVC.Models.SmsinfomsgModel
+
+
+
+<h2>Редактирование</h2>
+
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+    <fieldset>
+        <legend>@ViewBag.Title</legend>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Name)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Name)
+            @Html.ValidationMessageFor(model => model.Name)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Text)
+        </div>
+        <div class="editor-field">
+            @Html.TextAreaFor(model => model.Text, new { cols = "30", rows = "10" })
+            @Html.ValidationMessageFor(model => model.Text)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.SmsinfosprID)
+        </div>
+        <div class="editor-field">
+            @Html.DropDownList("SmsinfosprID",  new SelectList(ViewBag.SprList, "ID", "NAME"))
+
+            @Html.ValidationMessageFor(model => model.SmsinfosprID)
+        </div>
+
+        
+
+        <p>
+            <input type="submit" value="Обновить" />
+        </p>
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Назад", "Index")
+</div>
+
+
+

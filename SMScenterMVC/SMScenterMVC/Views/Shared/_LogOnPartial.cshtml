@@ -1,0 +1,142 @@
+﻿@{
+    /*
+ * Дата         Задание     Ответственный       Комментарий
+ * 2012-05-05   R0021       Герасимов           Справочники абонентов
+ * 2012-06-15   R0045       Герасимов           Windows авторизация
+ * 2012-06-22   R0050       Герасимов           АРМ SMS для ЦОО
+ * 2012-09-12   R0058       Книжник             Перенос пункта Пожелания в пункт Поддержка
+ * 2012-09-12   R0059       Герасимов           Статистика отправки сообщений
+ */
+}
+
+@{/*if(Request.IsAuthenticated) {
+    <text>Welcome <b>@Context.User.Identity.Name</b>!
+    [ @Html.ActionLink("Log Off", "LogOff", "Account") ]</text>
+}
+else {
+    @:[ @Html.ActionLink("Log On", "LogOn", "Account") ]
+*/}
+
+@if (Request.IsAuthenticated)
+{
+    <div id="logindisplay">
+    <text><b>@SMScenterMVC.Models.UserModel.CurrentUserNameFull</b></text>
+    </div>
+    <div id="myjquerymenu" class="jquerycssmenu">
+        <ul>                  
+            <li>@Html.ActionLink("Главная", "Index", "Home")</li>
+            @if (SMScenterMVC.Utils.AccessActions.IsAccess("Mailings::Read") || SMScenterMVC.Utils.AccessActions.IsAccess("SingleMailings::Read"))
+            {
+                <li>@Ajax.ActionLink("SMS", "", new AjaxOptions { HttpMethod = "GET" })
+            
+                @if (SMScenterMVC.Utils.AccessActions.IsAccess("Mailings::Read"))
+                {
+                    <ul>
+                    <li>@Html.ActionLink("Задания", "Index", "Mailings")
+                        <ul>
+                            <li>@Html.ActionLink("Просмотр", "Index", "Mailings")</li>
+                            @if (SMScenterMVC.Utils.AccessActions.IsAccess("Mailings::Read"))
+                            {
+                                <li>@Html.ActionLink("Создать", "MailingNew", "Mailings")</li>
+                            }
+                        </ul>
+                    </li>
+                    @if (SMScenterMVC.Utils.AccessActions.IsAccess("SingleMailings::Read"))
+                    {
+                        <li>@Html.ActionLink("Одиночные", "IndexSingle", "Mailings")</li>
+                    }
+                    
+                    
+					@if (SMScenterMVC.Utils.AccessActions.IsAccess("SmsInfo::Index"))
+					{
+						<li>@Html.ActionLink("АРМ SMS", "Index", "Smsinfo")
+						<ul>
+							@if (SMScenterMVC.Utils.AccessActions.IsAccess("SmsInfo::Edit"))
+							{
+								<li>@Html.ActionLink("Редактировать", "Edit", "Smsinfo")</li>
+								<li>@Html.ActionLink("Статистика", "Stat", "Smsinfo")</li>
+							}
+						</ul>
+						</li>
+					}
+
+					@if (SMScenterMVC.Utils.AccessActions.IsAccess("Mailings::Stat"))
+					{
+						<li>@Html.ActionLink("Статистика", "Stat", "Mailings")						
+						</li>
+					}
+
+                    </ul>
+                }
+                </li>
+            }
+            @{/*<li>@Html.ActionLink("Группы", "Index", "Groups")</li>
+            @if (HttpContext.Current.User.Identity.Name.Split('|')[2] == "3")*/}
+
+            @if (SMScenterMVC.Utils.AccessActions.IsAccess("RoleAction::Read") ||
+                 SMScenterMVC.Utils.AccessActions.IsAccess("User::Read") ||
+                 SMScenterMVC.Utils.AccessActions.IsAccess("Branches::Read"))
+            {
+                <li>@Ajax.ActionLink("Администрирование", "", new AjaxOptions { HttpMethod = "GET" })
+                <ul>
+                    @if (SMScenterMVC.Utils.AccessActions.IsAccess("RoleAction::Read"))
+                    {
+                        <li>@Ajax.ActionLink("Доступ", "", new AjaxOptions { HttpMethod = "GET" })
+                        <ul>
+                            <li>@Html.ActionLink("Роли", "Index", "RoleAction")</li>
+                            <li>@Html.ActionLink("Права", "IndexActions", "RoleAction")</li>
+                        </ul>
+                        </li>
+                    }
+                    @if (SMScenterMVC.Utils.AccessActions.IsAccess("User::Read"))
+                    {
+                        <li>@Html.ActionLink("Пользователи", "Index", "User")</li>
+                    }
+                    @if (SMScenterMVC.Utils.AccessActions.IsAccess("Branches::Read"))
+                    {
+                        <li>@Html.ActionLink("Филиалы", "Index", "Branches")</li>
+                    }
+                    
+                </ul>
+                </li>
+            }
+            
+            
+            @{/*if (HttpContext.Current.User.Identity.Name.Split('|')[2] == "3" || HttpContext.Current.User.Identity.Name.Split('|')[2] == "2")*/}
+             @if (SMScenterMVC.Utils.AccessActions.IsAccess("Abonents::Read") ||
+                 SMScenterMVC.Utils.AccessActions.IsAccess("Groups::Read"))
+             {
+                <li>@Ajax.ActionLink("Справочники", "", new AjaxOptions { HttpMethod = "GET" })
+                    <ul>
+                        @if (SMScenterMVC.Utils.AccessActions.IsAccess("Abonents::Read"))
+                        {
+                            <li>@Html.ActionLink("Абоненты", "Index", "Abonents")</li>
+                        }
+                        @if (SMScenterMVC.Utils.AccessActions.IsAccess("Groups::Read"))
+                        {
+                            <li>@Html.ActionLink("Группы", "Index", "Groups")</li>
+                        }
+                    </ul>
+                </li>
+             }
+                                 
+           
+
+            <li>@Html.ActionLink("Поддержка", "About", "Home")
+                <ul>
+                    @if (SMScenterMVC.Utils.AccessActions.IsAccess("UserWishes::Read"))
+                    {
+                        <li>@Html.ActionLink("Пожелания", "Index", "UserWishes")</li>
+                    }
+                 </ul>
+             </li>
+             
+        </ul>
+    </div>
+}
+else
+{
+    <div id="logindisplay">
+    [ @Html.ActionLink("Войти", "LogOn", "Admin") ]
+    </div>
+}
